@@ -34,12 +34,12 @@ package edu.towson.cis.cosc455.ngarrison.project1.interfaces;
 	void getCharacter();
 
 	 /**
-     * This method adds the current character the nextToken.
+     * This method adds the current character to the nextToken.
      */
-	void addCharacter();
+	void addCharacter(String nextToken);
 
 	/**
-	 * This is method gets the next character from the input and places it in
+	 * This  method gets the next character from the input and places it in
 	 * the nextCharacter class variable.
 	 *
 	 * @param c the current character
@@ -53,5 +53,5 @@ package edu.towson.cis.cosc455.ngarrison.project1.interfaces;
 	 *
 	 * @return true, if it is a legal token, otherwise false
 	 */
-	boolean lookupToken();
+	boolean lookupToken(String token);
 }

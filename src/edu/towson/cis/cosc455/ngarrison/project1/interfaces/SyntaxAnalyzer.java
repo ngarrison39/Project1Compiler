@@ -1,5 +1,7 @@
 package edu.towson.cis.cosc455.ngarrison.project1.interfaces;
 
+import edu.towson.cis.cosc455.ngarrison.project1.implementation.CompilerException;
+
 /**
  * COSC 455 Programming Languages: Implementation and Design.
  *

@@ -1,4 +1,4 @@
-package edu.towson.cis.cosc455.ngarrison.project1.interfaces;
+package edu.towson.cis.cosc455.ngarrison.project1.implementation;
 
 /**
  * Parsing exception. For simplicity, this is used for both lexical errors as
