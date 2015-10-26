@@ -1,7 +1,5 @@
 package edu.towson.cis.cosc455.ngarrison.project1.implementation;
 
-import java.util.Stack;
-
 public class Tokens {
 	//list all tokens here
 	public static final String DOCB = "#BEGIN";
@@ -27,13 +25,14 @@ public class Tokens {
 	public static final String ADDRESSB	= "(" ;
 	public static final String ADDRESSE	= ")" ;
 	
-	public static String tokenBin[] = {DOCB, DOCE, DEFB, DEFUSEE, USEB, HEAD, TITLEB, TITLEE, PARAB, PARAE, EQSIGN, BOLD, ITALICS, LISTITEMB, LISTITEME, NEWLINE, LINKB, LINKE, AUDIO, VIDEO, ADDRESSB, ADDRESSE}; //token bin //add this above main
-	public static String currentToken = "";
-	public static Stack tokenStack = new Stack();
-	public static Stack supplementalStack = new Stack();
-	
 	//TEXT = ("A".."Z" | "a".."z" | "0".."9" | "."| "," | ":" | "_" | "!" | "/" | "\u000C")* ;
 	//WS  =   ( " " | "\t"  | "\r" | "\n" ) {$channel=HIDDEN;} ;
+	
+	public final String tokenBin[] = {DOCB, DOCE, DEFB, DEFUSEE, USEB, HEAD, TITLEB, TITLEE, PARAB, PARAE, EQSIGN, BOLD, ITALICS, LISTITEMB, LISTITEME, NEWLINE, LINKB, LINKE, AUDIO, VIDEO, ADDRESSB, ADDRESSE}; //token bin //add this above main
+	public final String tags[] = {DOCB, DOCE, DEFB, DEFUSEE, USEB, HEAD, TITLEB, TITLEE, PARAB, PARAE, EQSIGN, BOLD, ITALICS, LISTITEMB, LISTITEME, NEWLINE, LINKB, LINKE, AUDIO, VIDEO, ADDRESSB, ADDRESSE};
+	public String currentToken = "";
+	
+	public String[] getArray(){
+		return tokenBin;
+	}
 }
-
-	//is this the right thing to do? while bin.hasNext does currentToken ==. store in an array instead?
