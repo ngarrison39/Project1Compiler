@@ -17,13 +17,13 @@ package edu.towson.cis.cosc455.ngarrison.project1.interfaces;
     String nextCharacter = "";
 
     /** The current position. */
-    int currentPosition = 0;
+    static int currentPosition = 0;
 
 	/**
 	 * This is the public method to be called when the Syntax Analyzer needs a new
 	 * token to be parsed.
 	 */
-	public void getNextToken();
+	void getNextToken(String file);
 
 	/**
 	 * This is method gets the next character from the input and places it in
@@ -31,7 +31,7 @@ package edu.towson.cis.cosc455.ngarrison.project1.interfaces;
 	 *
 	 * @return the character
 	 */
-	void getCharacter();
+	void getCharacter(String file);
 
 	 /**
      * This method adds the current character to the nextToken.
