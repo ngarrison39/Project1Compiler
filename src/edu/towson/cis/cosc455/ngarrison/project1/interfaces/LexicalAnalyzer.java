@@ -11,13 +11,13 @@ package edu.towson.cis.cosc455.ngarrison.project1.interfaces;
  * of this interface. 
  * 
  */
- public interface LexicalAnalyzer {
+public interface LexicalAnalyzer {
 
-    /** The next character. */
-    String nextCharacter = "";
+	/** The next character. */
+	String nextCharacter = "";
 
-    /** The current position. */
-    static int currentPosition = 0;
+	/** The current position. */
+	static int currentPosition = 0;
 
 	/**
 	 * This is the public method to be called when the Syntax Analyzer needs a new
@@ -33,9 +33,9 @@ package edu.towson.cis.cosc455.ngarrison.project1.interfaces;
 	 */
 	void getCharacter(String file);
 
-	 /**
-     * This method adds the current character to the nextToken.
-     */
+	/**
+	 * This method adds the current character to the nextToken.
+	 */
 	void addCharacter(String nextToken);
 
 	/**
