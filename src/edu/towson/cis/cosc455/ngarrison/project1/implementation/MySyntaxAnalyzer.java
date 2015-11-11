@@ -7,14 +7,13 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public static Stack<String> tokenStack = new Stack<String>();
 	public static Stack<String> supplementalStack = new Stack<String>();
 
-	// Used to see if variable defined as first thing in block
-	public static int defCount = 0;
+	//public static int printCount = 1;
 
-	public static int printCount = 1;
 
+/*	
 	public static void saveToStack(String token){
 		System.out.println("SyntaxAnalyzer received token");
-		tokenStack.push(token);
+		tokenStack.push(MyLexicalAnalyzer.tokenBin);
 		System.out.println("Token #" + printCount + " is :");
 		printCount++;
 		System.out.println("-" + tokenStack.pop() + "-");
@@ -22,6 +21,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 		MyLexicalAnalyzer.tokenBin = "";
 		//MyLexicalAnalyzer.getNextToken(MyLexicalAnalyzer.completeFile);
 	}
+*/
 
 	/**
 	 * This method implements the BNF grammar rule for the document annotation.
@@ -29,49 +29,66 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	 */
 	public void markdown() throws CompilerException{
 		if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCB)){
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.HEAD)){
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token");
 			//get next token
 			head();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.TITLEB)){
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			title();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.PARAB)){
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			paragraph();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.LISTITEMB)){
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			listitem();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.NEWLINE)){
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			newline();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.LINKB)){
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			link();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.AUDIO)){
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			audio();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.VIDEO)){
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			video();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DEFB)){
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			variableDefine();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.USEB)){
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
-			variableUse();
+			variableUse();			
+		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCE)){
+
+			//does it stop here?? and submit doc as is
+			//or check if more tokens and error if so?
+
 		} else{
 			//accept as text
 		}
@@ -84,14 +101,19 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public void head() throws CompilerException{
 		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin)){ //change to check if token not tag
 			if(MyLexicalAnalyzer.tokenBin.equals(Tokens.HEAD)){
-				//Add to parse tree
+
+				//IS TEXT REQUIRED OR OPTIONAL???
+
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//get next token
-				markdown();
 			} else{
-				//ERROR REPORT NOT VALID IN TITLE STRUCTURE
+				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.exit(1);
 			}
 		} else{
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			head();
 		}		
@@ -105,14 +127,19 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public void title() throws CompilerException{
 		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin)){ //change to check if token not tag
 			if(MyLexicalAnalyzer.tokenBin.equals(Tokens.TITLEE)){
-				//Add to parse tree
+
+				//IS TEXT REQUIRED OR OPTIONAL???
+
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//get next token
-				markdown();
 			} else{
-				//ERROR REPORT NOT VALID IN TITLE STRUCTURE
+				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.exit(1);
 			}
 		} else{
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			title();
 		}		
@@ -132,13 +159,14 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	 */
 	public void paragraph() throws CompilerException{
 		if(MyLexicalAnalyzer.tokenBin.equals(Tokens.DEFB)){
-			//add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			variableDefine();	
 		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.PARAE)){
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
-			defCount = 0; //wont need this with BNF style?
 			markdown();
 		} else{
 			innerText();
@@ -152,43 +180,51 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public void innerText() throws CompilerException{
 		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin)){ //change to check if token not tag
 			if(MyLexicalAnalyzer.tokenBin.equals(Tokens.BOLD)){
-				defCount++;
-				//Add to parse tree which is the stack?
+
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//get next token
 				bold(); // THIS WILL CALL MARKDOWN WHEN DONE DONT WANT THAT
 			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ITALICS)){
-				defCount++;
-				//Add to parse tree
+
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//get next token
 				italics(); // THIS WILL CALL MARKDOWN WHEN DONE DONT WANT THAT
 			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.LISTITEMB)){
-				defCount++;
-				//Add to parse tree
+
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//get next token
 				italics(); // THIS WILL CALL MARKDOWN WHEN DONE DONT WANT THAT
 			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.AUDIO)){
-				defCount++;
-				//Add to parse tree
+
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//get next token
 				italics(); // THIS WILL CALL MARKDOWN WHEN DONE DONT WANT THAT
 			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.VIDEO)){
-				defCount++;
-				//Add to parse tree
+
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//get next token
 				italics(); // THIS WILL CALL MARKDOWN WHEN DONE DONT WANT THAT
 			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSB)){
-				defCount++;
-				//Add to parse tree
+
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//get next token
 				italics(); // THIS WILL CALL MARKDOWN WHEN DONE DONT WANT THAT
 			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.NEWLINE)){
-				defCount++;
-				//Add to parse tree
+
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//get next token
 				italics(); // THIS WILL CALL MARKDOWN WHEN DONE DONT WANT THAT
 			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.USEB)){
-				defCount++;
-				//Add to parse tree
+
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//get next token
 				italics(); // THIS WILL CALL MARKDOWN WHEN DONE DONT WANT THAT
 			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.PARAE)){
@@ -196,11 +232,13 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			} else{
 
 
-				//ERROR REPORT NOT VALID IN TITLE STRUCTURE
+				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.exit(1);
 
 			}
 		} else{
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			innerText();
 		}
@@ -212,7 +250,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	 * @throws CompilerException
 	 */
 	public void variableDefine() throws CompilerException{
-
+		//will need a method to strip only white space for in between =
 	}
 
 	/**
@@ -220,6 +258,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	 * @throws CompilerException
 	 */
 	public void variableUse() throws CompilerException{
+		//will need a method to strip only white space for in between =
 
 	}
 
@@ -230,14 +269,17 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public void bold() throws CompilerException{
 		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin)){ //change to check if token not tag
 			if(MyLexicalAnalyzer.tokenBin.equals(Tokens.BOLD)){
-				//Add to parse tree
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//get next token
 				markdown();
 			} else{
-				//ERROR REPORT NOT VALID IN BOLD STRUCTURE
+				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.exit(1);
 			}
 		} else{
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			bold();
 		}		
@@ -250,14 +292,17 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public void italics() throws CompilerException{
 		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin)){
 			if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ITALICS)){
-				//Add to parse tree
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//get next token
 				markdown();
 			} else{
-				//ERROR REPORT NOT VALID IN ITALICS STRUCTURE
+				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.exit(1);
 			}
 		} else{
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			italics();
 		}		
@@ -269,7 +314,8 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	 */
 	public void listitem() throws CompilerException{
 		if(MyLexicalAnalyzer.tokenBin.equals(Tokens.LISTITEME)){
-			//add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			markdown();	
 		} else{
@@ -284,18 +330,21 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public void innerItem() throws CompilerException{
 		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin)){ //change to check if token not tag
 			if(MyLexicalAnalyzer.tokenBin.equals(Tokens.BOLD)){
-				defCount++;
-				//Add to parse tree which is the stack?
+
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//get next token
 				bold(); // THIS WILL CALL MARKDOWN WHEN DONE DONT WANT THAT
 			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ITALICS)){
-				defCount++;
-				//Add to parse tree
+
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//get next token
 				italics(); // THIS WILL CALL MARKDOWN WHEN DONE DONT WANT THAT
 			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.LINKB)){
-				defCount++;
-				//Add to parse tree
+
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//get next token
 				italics(); // THIS WILL CALL MARKDOWN WHEN DONE DONT WANT THAT
 			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.LISTITEME)){
@@ -303,11 +352,13 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			} else{
 
 
-				//ERROR REPORT NOT VALID IN TITLE STRUCTURE
+				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.exit(1);
 
 			}
 		} else{
-			//Add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			innerItem();
 		}
@@ -319,33 +370,32 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	 * @throws CompilerException
 	 */
 	public void link() throws CompilerException{
-		boolean hasText = false;
+		boolean descriptionText = false;
 		if(MyLexicalAnalyzer.tokenBin.equals(Tokens.LINKE)){
-			if(hasText == false){
+			if(descriptionText == false){
 
-				//ERROR MUST CONTAIN TEXT
-
+				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion "); // **** --> NEED TO CHECK FOR IF ITS ONLY WHITE SPACE AND NO "TEXT" ??
+				System.exit(1);
 			} else{
-				//add to parse tree
-				hasText = false;
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
+				//descriptionText = false;
 				//get next token
 				if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSB)){
-					//add to parse tree
+					tokenStack.push(MyLexicalAnalyzer.tokenBin);
+					System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 					//get next token
-					if(Tokens.isToken(MyLexicalAnalyzer.tokenBin)){
-
-						//ERROR CAN ONLY BE TEXT
-
-					}
-
+					address();
 				}
 			}
 		} else if(Tokens.isToken(MyLexicalAnalyzer.tokenBin) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.LINKE)){
 
-			//ERROR DOES NOT FOLLOW SYNTAX
+			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.exit(1);
 
 		} else{
-			//add to parse tree
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			link();
 		}	
@@ -356,7 +406,22 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	 * @throws CompilerException
 	 */
 	public void audio() throws CompilerException{
+		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSB)){
 
+			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.exit(1);
+
+		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSB)){
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
+			//get next token
+			address();
+		} else{
+
+			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.exit(1);
+
+		}
 	}
 
 	/**
@@ -364,6 +429,44 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	 * @throws CompilerException
 	 */
 	public void video() throws CompilerException{
+		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSB)){
+
+			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.exit(1);
+
+		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSB)){
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
+			//get next token
+			address();
+		} else{
+
+			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.exit(1);
+
+		}
+	}
+
+	public void address() throws CompilerException{
+		boolean addressText = false;
+		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSE)){
+
+			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion "); //CAN ONLY BE TEXT
+			System.exit(1);
+
+		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSE)){
+			if(addressText == false){
+
+				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion "); //MUST CONTAIN TEXT
+				System.exit(1);
+
+			} else{
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
+				//addressText = false;
+				//get next token
+			}
+		}
 
 	}
 
@@ -373,6 +476,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	 */
 	public void newline() throws CompilerException{
 
+		//do you even need this?? theres nothing else to do for it
 	}
 
 }
