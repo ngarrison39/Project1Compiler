@@ -9,8 +9,15 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 
 	public MyLexicalAnalyzer buildParseStack;
 	public boolean created = false;
+
 	/* Used to check if required text is present*/
 	boolean hasText = false;
+	/* Used to check if #BEGIN is first token in file */
+	int tokenCounter = 0;
+	/* Used to check if #BEGIN is used in file */
+	boolean beginReceived = false;
+	/* Used to check if #END used in file*/
+	boolean endReceived = false;
 
 	//This was a quick fix because of static/non-static issues 
 	public MySyntaxAnalyzer(){
@@ -34,7 +41,6 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 
 	public void addToParseStack(){
 		tokenStack.push(MyLexicalAnalyzer.tokenBin);
-		System.out.println("SyntaxAnalyzer stored after check token ---> -" + MyLexicalAnalyzer.tokenBin + "-");
 		MyLexicalAnalyzer.tokenBin ="";
 	}
 
@@ -43,14 +49,17 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	 * @throws CompilerException
 	 */
 	public void markdown() throws CompilerException{
-
-		System.out.println();
-		System.out.println("checking in markdown -----> -" + MyLexicalAnalyzer.tokenBin + "-");
-
 		if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCB)){
-			addToParseStack();
-			askForToken();
-			markdown();
+			if(tokenCounter != 0){
+				System.out.println("Syntax error: #BEGIN does not start the file. Exiting conversion ");
+				System.exit(1);
+			}
+			else{
+				beginReceived = true;
+				addToParseStack();
+				askForToken();
+				markdown();
+			}
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DEFB)){
 			addToParseStack();
 			askForToken();
@@ -64,15 +73,27 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			askForToken();
 			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCE)){
+			beginReceived = true;
 			addToParseStack();
-			System.out.println("******");
-			System.out.println("REACHED END OF SYNTAX ANALYZER");
-			System.out.println("******");
+			if(beginReceived ==false){
+				System.out.println("Syntax error: #BEGIN was not found in the file. Exiting conversion ");
+				System.exit(1);
+			}
+			else{
+				while(!tokenStack.isEmpty()){
+					System.out.println("--------------------------------------");
+					System.out.println(tokenStack.pop());
+				}
+				System.out.println();
+				System.out.println("******");
+				System.out.println("REACHED END OF SYNTAX ANALYZER");
+				System.out.println("******");
 
-			//does it stop here?? and submit doc as is
-			//or check if more tokens and error if so?
+				//does it stop here?? and submit doc as is
+				//or check if more tokens and error if so?
 
-		} else{
+			}
+		}else{
 			body();
 		}
 	}
@@ -169,10 +190,8 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCE)){
 			markdown();	
 		} else{
-			System.out.println("Text type token is -----> -" + MyLexicalAnalyzer.tokenBin + "-");
 			addToParseStack();
 			askForToken();
-			System.out.println("Token is -----> -" + MyLexicalAnalyzer.tokenBin + "-");
 			markdown();
 		}
 	}

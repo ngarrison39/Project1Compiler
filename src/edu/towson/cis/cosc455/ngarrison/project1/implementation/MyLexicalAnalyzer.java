@@ -19,6 +19,9 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 
 	/** Special string to look at the following character without setting nextCharacter */
 	public static String tempChar = "";
+	
+	/* breaks loop if getCharacter causes the end of the file to be reached */
+	public static boolean reachedEnd = false;
 
 	public MyLexicalAnalyzer(){
 		completeFile = "";
@@ -39,8 +42,6 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			getCharacter(file);
 			charStates(nextCharacter);
 		} else{
-			System.out.println(tokenBin + " tokenBin at line 43 MyLex");
-			System.out.println();
 			tokenBin = Tokens.currentToken;
 		}
 	}
@@ -56,17 +57,20 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			nextCharacter = String.valueOf(completeFile.charAt(currentPosition));
 		}
 		else if(currentPosition == completeFile.length()){
-			System.out.println("reached end of document");
-			if(lookupToken(Tokens.currentToken)){
+			if(reachedEnd != true){
+			System.out.println("reached end of document -------------------- getCharacter MyLex");
+			if(noSpecialTags(Tokens.currentToken)){
 				System.out.println("---->" + Tokens.currentToken + "<-----");
 				storeToken(Tokens.currentToken);
-				while(!MySyntaxAnalyzer.tokenStack.isEmpty()){
-					System.out.println("--------------------------------------");
-					System.out.println(MySyntaxAnalyzer.tokenStack.pop());
-				}
+				reachedEnd = true;
+			} else if(lookupToken(Tokens.currentToken)){
+				System.out.println("---->" + Tokens.currentToken + "<-----");
+				storeToken(Tokens.currentToken);
+				reachedEnd = true;
 			}
-		}  
+		}
 	}
+}
 
 	/**
 	 * This method adds the current character to the nextToken.
@@ -89,6 +93,15 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 		} else
 			return false;
 	}
+	
+	public boolean noSpecialTags(String possible){
+		for(int i = 0; i < possible.length(); i++){
+			if(!String.valueOf(possible.charAt(i)).equals(Tokens.tokenTags[i])){
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * This method checks to see if the current, possible token is legal in the
@@ -110,7 +123,6 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 
 	public static void storeToken(String saveToken){
 		tokenBin = saveToken;
-		System.out.println("Lexical jsut stored token ---> -" + tokenBin + "-");
 		Tokens.currentToken = "";
 	}
 
@@ -125,22 +137,15 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			while(!isSpace(nextCharacter)){
 				addCharacter(nextCharacter);
 				getCharacter(completeFile);
+				if(reachedEnd == true){
+					break;
+				}
+			}
+			if(reachedEnd == true){
+				break;
 			}
 			if(lookupToken(Tokens.currentToken)){
 				storeToken(Tokens.currentToken);
-				
-				
-				//charStates(nextCharacter);
-				
-			/*
-			 * 
-			 * 
-			 *  will have to set current position-- ?? so this char doesnt get thrown away, check anywhere else that does this
-			 * 
-			 * 	
-			 */
-				
-				
 			}
 			break;
 
@@ -200,7 +205,9 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			//will be used for any plain text, whitespace, \n, \r, etc.
 			addCharacter(thisChar);
 			getCharacter(completeFile);
-			if(Tokens.isTag(nextCharacter)){
+			if(reachedEnd == true){
+				break;
+			} else if(Tokens.isTag(nextCharacter)){
 				storeToken(Tokens.currentToken);
 			} else{
 				charStates(nextCharacter);
