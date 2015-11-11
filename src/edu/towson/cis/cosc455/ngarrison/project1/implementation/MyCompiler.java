@@ -5,7 +5,8 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class MyCompiler {
-	public static String completeFile = "#BEGIN ^header here^ $DEF = @%* afga @ % * ~ { ] [ } [erw] {erg } ; gc*gc%gc@gc(gc;gc^gc**gc-gc=gc?  this should be text **bold here** #END";
+	//public static String completeFile = "#BEGIN ^header here^ $DEF = @%* afga @ % * ~ { ] [ } [erw] {erg } ; gc*gc%gc@gc(gc;gc^gc**gc-gc=gc?  this should be text **bold here** #END";
+	public static String completeFile = "#BEGIN ^<simple test>^ #END";
 
 	public static void main(String args[]){
 		System.out.println(completeFile + " --> completeFile at line 11 MyComp");

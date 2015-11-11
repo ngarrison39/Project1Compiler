@@ -33,10 +33,6 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 	 * This is the public method to be called when the Syntax Analyzer needs a new
 	 * token to be parsed.
 	 */
-
-	public void giveToken(){
-		getNextToken(MyLexicalAnalyzer.completeFile);
-	}
 	
 	public void getNextToken(String file){
 		if(tokenBin.equals("")){
@@ -46,7 +42,6 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			System.out.println(tokenBin + " tokenBin at line 43 MyLex");
 			System.out.println();
 			tokenBin = Tokens.currentToken;
-			//MySyntaxAnalyzer.saveToStack(tokenBin);
 		}
 	}
 
@@ -63,9 +58,6 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 		else if(currentPosition == completeFile.length()){
 			if(lookupToken(Tokens.currentToken)){
 				storeToken(Tokens.currentToken);
-
-				//have syntax analyzer start working 
-				//MySyntaxAnalyzer.testPrintStack();
 			}
 		}  
 	}
@@ -114,7 +106,6 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 	public static void storeToken(String saveToken){
 		tokenBin = saveToken;
 		Tokens.currentToken = "";
-		//MySyntaxAnalyzer.saveToStack(tokenBin);
 	}
 
 	public void charStates(String thisChar){
@@ -130,8 +121,11 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 				getCharacter(completeFile);
 			}
 			if(lookupToken(Tokens.currentToken)){
+				currentPosition--;
 				storeToken(Tokens.currentToken);
-				charStates(nextCharacter);
+				
+				
+				//charStates(nextCharacter);
 				
 			/*
 			 * 
@@ -178,7 +172,6 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			addCharacter(thisChar);
 			if(lookupToken(Tokens.currentToken)){
 				storeToken(Tokens.currentToken);
-				getNextToken(completeFile);
 			}
 			break;
 
@@ -190,12 +183,11 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 				addCharacter(thisChar);
 				if(lookupToken(Tokens.currentToken)){
 					storeToken(Tokens.currentToken);
-					getNextToken(completeFile);
 				}
 			} else{
 				if(lookupToken(Tokens.currentToken)){
+					currentPosition--;
 					storeToken(Tokens.currentToken);
-					charStates(nextCharacter);
 				}
 			}
 			break;
@@ -205,8 +197,8 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			addCharacter(thisChar);
 			getCharacter(completeFile);
 			if(Tokens.isTag(nextCharacter)){
+				currentPosition--;
 				storeToken(Tokens.currentToken);
-				charStates(nextCharacter);
 			} else{
 				charStates(nextCharacter);
 			}

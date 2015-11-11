@@ -9,6 +9,8 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	
 	public MyLexicalAnalyzer buildParseStack;
 	public boolean created = false;
+	/* Used to check if required text is present*/
+	boolean hasText = false;
 
 
 public void askForToken(){
@@ -27,11 +29,6 @@ public void addToParseStack(){
 	MyLexicalAnalyzer.tokenBin ="";
 }
 
-//DELETE BELOW
-public void storeAndReset(){
-	addToParseStack();
-	askForToken();
-}
 
 /*	
 	public static void saveToStack(String token){
@@ -66,16 +63,12 @@ public void storeAndReset(){
 			head();
 			askForToken();
 			markdown();
-		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.TITLEB)){
-			addToParseStack();
-			askForToken();
-			title();
-			askForToken();
-			markdown();
-			
-			// BREAK HERE AND PUT IN BODY?????
-			
-		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.PARAB)){
+		} 
+		
+		
+		// BREAK HERE AND PUT IN BODY?????
+		
+		else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.PARAB)){
 			addToParseStack();
 			askForToken();
 			paragraph();
@@ -137,21 +130,20 @@ public void storeAndReset(){
 	 * @throws CompilerException
 	 */
 	public void head() throws CompilerException{
-		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin)){ //change to check if token not tag
 			if(MyLexicalAnalyzer.tokenBin.equals(Tokens.HEAD)){
-
-				//IS TEXT REQUIRED OR OPTIONAL???
-
 				addToParseStack();
+			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.TITLEB)){
+				addToParseStack();
+				title();
+				
+				//
+				// WILL WHITESPACE MESS THIS UP? SO ^            ^ WOULD ERROR? or is that acceptable
+				// add an else if(ifOnlySpaces()){ ignore and call head()}
+				
 			} else{
 				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
 				System.exit(1);
-			}
-		} else{
-			addToParseStack();
-			askForToken();
-			head();
-		}		
+			}		
 	}
 
 	/**
@@ -162,9 +154,6 @@ public void storeAndReset(){
 	public void title() throws CompilerException{
 		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin)){ //change to check if token not tag
 			if(MyLexicalAnalyzer.tokenBin.equals(Tokens.TITLEE)){
-
-				//IS TEXT REQUIRED OR OPTIONAL???
-
 				addToParseStack();
 			} else{
 				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
@@ -293,7 +282,7 @@ public void storeAndReset(){
 	 * @throws CompilerException
 	 */
 	public void bold() throws CompilerException{
-		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin)){ //change to check if token not tag
+		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin)){
 			if(MyLexicalAnalyzer.tokenBin.equals(Tokens.BOLD)){
 				addToParseStack();
 			} else{
@@ -380,14 +369,13 @@ public void storeAndReset(){
 	 * @throws CompilerException
 	 */
 	public void link() throws CompilerException{
-		boolean descriptionText = false;
 		if(MyLexicalAnalyzer.tokenBin.equals(Tokens.LINKE)){
-			if(descriptionText == false){
-
+			if(hasText == false){
 				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion "); // **** --> NEED TO CHECK FOR IF ITS ONLY WHITE SPACE AND NO "TEXT" ??
 				System.exit(1);
 			} else{
 				addToParseStack();
+				hasText = false;
 				askForToken();
 				if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSB)){
 					addToParseStack();
@@ -399,14 +387,12 @@ public void storeAndReset(){
 				}
 			}
 		} else if(Tokens.isToken(MyLexicalAnalyzer.tokenBin) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.LINKE)){
-
 			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
 			System.exit(1);
-
 		} else{
-			tokenStack.push(MyLexicalAnalyzer.tokenBin);
-			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
-			//get next token
+			addToParseStack();
+			hasText = true;
+			askForToken();
 			link();
 		}	
 	}
@@ -422,9 +408,8 @@ public void storeAndReset(){
 			System.exit(1);
 
 		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSB)){
-			tokenStack.push(MyLexicalAnalyzer.tokenBin);
-			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
-			//get next token
+			addToParseStack();
+			askForToken();
 			address();
 		} else{
 
@@ -445,9 +430,8 @@ public void storeAndReset(){
 			System.exit(1);
 
 		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSB)){
-			tokenStack.push(MyLexicalAnalyzer.tokenBin);
-			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
-			//get next token
+			addToParseStack();
+			askForToken();
 			address();
 		} else{
 
@@ -458,29 +442,26 @@ public void storeAndReset(){
 	}
 
 	public void address() throws CompilerException{
-		boolean addressText = false;
 		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSE)){
 
 			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion "); //CAN ONLY BE TEXT
 			System.exit(1);
 
 		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSE)){
-			if(addressText == false){
+			if(hasText == false){
 
 				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion "); //MUST CONTAIN TEXT
 				System.exit(1);
 
 			} else{
-				tokenStack.push(MyLexicalAnalyzer.tokenBin);
-				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
+				addToParseStack();
+				hasText = false;
 			}
 		} else{
-				tokenStack.push(MyLexicalAnalyzer.tokenBin);
-				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
-				//addressText = false;
-				//get next token
-				addressText = true;
-				address();
+			addToParseStack();
+			hasText = true;
+			askForToken();
+			address();
 			}
 		}
 	
