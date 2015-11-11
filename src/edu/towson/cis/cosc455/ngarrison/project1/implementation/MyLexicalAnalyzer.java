@@ -56,7 +56,9 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			nextCharacter = String.valueOf(completeFile.charAt(currentPosition));
 		}
 		else if(currentPosition == completeFile.length()){
+			System.out.println("reached end of document");
 			if(lookupToken(Tokens.currentToken)){
+				System.out.println("---->" + Tokens.currentToken + "<-----");
 				storeToken(Tokens.currentToken);
 			}
 		}  
@@ -96,15 +98,15 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 				return true;
 			}
 		}
-
-		//CREATE AN ERROR REPORT: NOT A VALID TOKEN LEX ERROR. print current token " is not a valid token for this language"
-		//System.exit(1);
+		System.out.println("Lexical error: " + Tokens.currentToken + " is not a valid token for this language. Exiting token parsing.");
+		System.exit(1);
 
 		return false;
 	}
 
 	public static void storeToken(String saveToken){
 		tokenBin = saveToken;
+		System.out.println("Lexical jsut stored token ---> -" + tokenBin + "-");
 		Tokens.currentToken = "";
 	}
 
@@ -121,7 +123,6 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 				getCharacter(completeFile);
 			}
 			if(lookupToken(Tokens.currentToken)){
-				currentPosition--;
 				storeToken(Tokens.currentToken);
 				
 				
@@ -186,7 +187,6 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 				}
 			} else{
 				if(lookupToken(Tokens.currentToken)){
-					currentPosition--;
 					storeToken(Tokens.currentToken);
 				}
 			}
@@ -197,7 +197,6 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			addCharacter(thisChar);
 			getCharacter(completeFile);
 			if(Tokens.isTag(nextCharacter)){
-				currentPosition--;
 				storeToken(Tokens.currentToken);
 			} else{
 				charStates(nextCharacter);

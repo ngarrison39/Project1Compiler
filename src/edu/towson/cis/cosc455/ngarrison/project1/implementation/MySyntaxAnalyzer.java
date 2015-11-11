@@ -11,6 +11,15 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public boolean created = false;
 	/* Used to check if required text is present*/
 	boolean hasText = false;
+	
+	public MySyntaxAnalyzer(){
+		try{
+		markdown();
+		}
+		catch(CompilerException e){
+			System.out.println("Sorry this doesnt work");
+		}
+	}
 
 
 public void askForToken(){
@@ -24,29 +33,19 @@ public void askForToken(){
 
 public void addToParseStack(){
 	tokenStack.push(MyLexicalAnalyzer.tokenBin);
-	System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
-	System.out.println("SyntaxAnalyzer received token");
+	System.out.println("SyntaxAnalyzer stored after check token ---> -" + MyLexicalAnalyzer.tokenBin + "-");
 	MyLexicalAnalyzer.tokenBin ="";
 }
 
-
-/*	
-	public static void saveToStack(String token){
-		System.out.println("SyntaxAnalyzer received token");
-		tokenStack.push(MyLexicalAnalyzer.tokenBin);
-		System.out.println("Token #" + printCount + " is :");
-		printCount++;
-		System.out.println("-" + tokenStack.pop() + "-");
-		System.out.println();
-		MyLexicalAnalyzer.tokenBin = "";
-		//MyLexicalAnalyzer.getNextToken(MyLexicalAnalyzer.completeFile);
-	}
-*/
 	/**
 	 * This method implements the BNF grammar rule for the document annotation.
 	 * @throws CompilerException
 	 */
 	public void markdown() throws CompilerException{
+		
+		System.out.println();
+		System.out.println("checking in markdown -----> -" + MyLexicalAnalyzer.tokenBin + "-");
+		
 		if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCB)){
 			addToParseStack();
 			askForToken();
@@ -90,25 +89,25 @@ public void addToParseStack(){
 			addToParseStack();
 			askForToken();
 			link();
-			//get next token
+			askForToken();
 			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.AUDIO)){
 			addToParseStack();
 			askForToken();
 			audio();
-			//get next token
+			askForToken();
 			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.VIDEO)){
 			addToParseStack();
 			askForToken();
 			video();
-			//get next token
+			askForToken();
 			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.USEB)){
 			addToParseStack();
 			askForToken();
 			variableUse();
-			//get next token
+			askForToken();
 			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCE)){
 			System.out.println("******");
@@ -119,8 +118,10 @@ public void addToParseStack(){
 			//or check if more tokens and error if so?
 
 		} else{
+			System.out.println("Text type token is -----> -" + MyLexicalAnalyzer.tokenBin + "-");
 			addToParseStack();
 			askForToken();
+			System.out.println("Token is -----> -" + MyLexicalAnalyzer.tokenBin + "-");
 			markdown();
 		}
 	}
@@ -139,7 +140,8 @@ public void addToParseStack(){
 				//
 				// WILL WHITESPACE MESS THIS UP? SO ^            ^ WOULD ERROR? or is that acceptable
 				// add an else if(ifOnlySpaces()){ ignore and call head()}
-				
+				askForToken();
+				head();
 			} else{
 				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
 				System.exit(1);

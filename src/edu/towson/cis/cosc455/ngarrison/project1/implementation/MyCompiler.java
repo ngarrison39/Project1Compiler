@@ -11,6 +11,7 @@ public class MyCompiler {
 	public static void main(String args[]){
 		System.out.println(completeFile + " --> completeFile at line 11 MyComp");
 		MyLexicalAnalyzer prime = new MyLexicalAnalyzer(completeFile);
+		MySyntaxAnalyzer  build = new MySyntaxAnalyzer();
 		/*
 		String fileName = "";
 		Scanner input = new Scanner(System.in);
