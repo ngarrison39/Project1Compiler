@@ -9,6 +9,8 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 
 	public MyLexicalAnalyzer buildParseStack;
 	public boolean created = false;
+	
+	int tokenCount = 0;
 
 	/* Used to check if required text is present*/
 	boolean hasText = false;
@@ -51,7 +53,11 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 
 	public void addToParseStack(){
 		if(primer != 1){
+			tokenCounter++;
 			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			System.out.println();
+			System.out.println("Successfully added token, token is ---> -" + MyLexicalAnalyzer.tokenBin + "-");
+			System.out.println();
 			MyLexicalAnalyzer.tokenBin ="";	
 		}
 		/*
@@ -132,7 +138,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			askForToken();
 			head();
 		} else{
-			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 			System.exit(1);
 		}		
 	}
@@ -147,7 +153,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			if(MyLexicalAnalyzer.tokenBin.equals(Tokens.TITLEE)){
 				addToParseStack();
 			} else{
-				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 				System.exit(1);
 			}
 		} else{
@@ -282,13 +288,14 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.USEB)){
 				addToParseStack();
 				askForToken();
+				System.out.println("sending token to variableUse() token is ---> -" + MyLexicalAnalyzer.tokenBin + "-");
 				variableUse();
 				askForToken();
 				innerText();
 			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.PARAE)){
 				paragraph();
 			} else{
-				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 				System.exit(1);
 			}
 		} else{
@@ -306,13 +313,13 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public void variableDefine() throws CompilerException{
 		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.EQSIGN) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.DEFUSEE)){
 			//Cannot have other tokens here
-			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 			System.exit(1);
 
 		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.EQSIGN)){
 			if(hasText == false){
 				//Must contain text for variable name
-				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 				System.exit(1);
 
 			} else{
@@ -324,7 +331,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.DEFUSEE)){
 			if(hasText == false){
 				//Must contain text for variable definition
-				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 				System.exit(1);
 
 			} else{
@@ -335,7 +342,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			addToParseStack();
 			hasText = true;
 			askForToken();
-			address();
+			variableDefine();
 		}
 	}
 
@@ -346,13 +353,13 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public void variableUse() throws CompilerException{
 		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.DEFUSEE)){
 			//Cannot have other tokens here
-			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 			System.exit(1);
 
 		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.DEFUSEE)){
 			if(hasText == false){
 				//Must contain text for variable name
-				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 				System.exit(1);
 
 			} else{
@@ -360,9 +367,11 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 				hasText = false;
 			}
 		} else{
+			System.out.println("just added in variableUse() token is ---> -" + MyLexicalAnalyzer.tokenBin + "-");
 			addToParseStack();
 			hasText = true;
 			askForToken();
+			System.out.println("sending next token back to variableUse() token is ---> -" + MyLexicalAnalyzer.tokenBin + "-");
 			variableUse();
 		}
 	}
@@ -376,7 +385,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			if(MyLexicalAnalyzer.tokenBin.equals(Tokens.BOLD)){
 				addToParseStack();
 			} else{
-				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 				System.exit(1);
 			}
 		} else{
@@ -395,7 +404,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ITALICS)){
 				addToParseStack();
 			} else{
-				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 				System.exit(1);
 			}
 		} else{
@@ -441,10 +450,17 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 				link();
 				askForToken();
 				innerItem();
+			}  else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.USEB)){
+				addToParseStack();
+				askForToken();
+				System.out.println("sending token to variableUse() token is ---> -" + MyLexicalAnalyzer.tokenBin + "-");
+				variableUse();
+				askForToken();
+				innerItem();
 			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.LISTITEME)){
 				listitem();
 			} else{
-				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 				System.exit(1);
 			}
 		} else{
@@ -461,7 +477,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public void link() throws CompilerException{
 		if(MyLexicalAnalyzer.tokenBin.equals(Tokens.LINKE)){
 			if(hasText == false){
-				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion "); // **** --> NEED TO CHECK FOR IF ITS ONLY WHITE SPACE AND NO "TEXT" ??
+				System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion "); // **** --> NEED TO CHECK FOR IF ITS ONLY WHITE SPACE AND NO "TEXT" ??
 				System.exit(1);
 			} else{
 				addToParseStack();
@@ -472,12 +488,12 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 					askForToken();
 					address();
 				} else{
-					System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+					System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 					System.exit(1);
 				}
 			}
 		} else if(Tokens.isToken(MyLexicalAnalyzer.tokenBin) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.LINKE)){
-			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 			System.exit(1);
 		} else{
 			addToParseStack();
@@ -494,7 +510,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public void audio() throws CompilerException{
 		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSB)){
 
-			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 			System.exit(1);
 
 		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSB)){
@@ -503,7 +519,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			address();
 		} else{
 
-			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 			System.exit(1);
 
 		}
@@ -516,7 +532,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public void video() throws CompilerException{
 		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSB)){
 
-			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 			System.exit(1);
 
 		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSB)){
@@ -525,7 +541,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			address();
 		} else{
 
-			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
 			System.exit(1);
 
 		}
@@ -534,13 +550,13 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public void address() throws CompilerException{
 		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSE)){
 
-			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion "); //CAN ONLY BE TEXT
+			System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion "); //CAN ONLY BE TEXT
 			System.exit(1);
 
 		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.ADDRESSE)){
 			if(hasText == false){
 
-				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion "); //MUST CONTAIN TEXT
+				System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion "); //MUST CONTAIN TEXT
 				System.exit(1);
 
 			} else{

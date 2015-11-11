@@ -6,10 +6,10 @@ import java.util.Scanner;
 
 public class MyCompiler {
 	public static String completeFile;
-	/*
+/*	
 	//public static String completeFile = "#BEGIN ^header here^ $DEF = @%* afga @ % * ~ { ] [ } [erw] {erg } ; gc*gc%gc@gc(gc;gc^gc**gc-gc=gc?  this should be text **bold here** #END";
-	public static String completeFile = "#BEGIN ^<simple  test>^ { ** bold here ** } *italics here* plain text @(http://www.help.com) #END";
-	//public static String completeFile = "#BEGIN ^<simple  test>^ { ** bold here ** } *italics here* plain text";
+	//public static String completeFile = "#BEGIN ^<simple  test>^ { ** bold here ** } *italics here* plain text @(http://www.help.com) #END";
+	public static String completeFile = "#BEGIN  $DEF lastname = Simpson $END { The members of the $USE name $END family are: + Homer $USE name $END ; + Marge $USE lastname $END ; + Bart $USE lastname $END ; + Lisa $USE lastname $END ; + Maggie $USE lastname $END ; } #END ";
 
 	public static void main(String args[]){
 		System.out.println(completeFile + " --> completeFile at line 11 MyComp");
@@ -21,7 +21,7 @@ public class MyCompiler {
 		String fileName = "";
 		Scanner input = new Scanner(System.in);
 		System.out.println("Enter the filename to be used with extension .mkd :");
-		if(input.hasNext()){
+		if(input.hasNextLine()){  //hasNextLine to use filepath
 			fileName = input.next();
 		}
 		while(!fileName.endsWith(".mkd")){
