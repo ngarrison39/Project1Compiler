@@ -34,6 +34,10 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 	 * token to be parsed.
 	 */
 
+	public void giveToken(){
+		getNextToken(MyLexicalAnalyzer.completeFile);
+	}
+	
 	public void getNextToken(String file){
 		if(tokenBin.equals("")){
 			getCharacter(file);
@@ -42,7 +46,7 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			System.out.println(tokenBin + " tokenBin at line 43 MyLex");
 			System.out.println();
 			tokenBin = Tokens.currentToken;
-			MySyntaxAnalyzer.saveToStack(tokenBin);
+			//MySyntaxAnalyzer.saveToStack(tokenBin);
 		}
 	}
 
@@ -110,7 +114,7 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 	public static void storeToken(String saveToken){
 		tokenBin = saveToken;
 		Tokens.currentToken = "";
-		MySyntaxAnalyzer.saveToStack(tokenBin);
+		//MySyntaxAnalyzer.saveToStack(tokenBin);
 	}
 
 	public void charStates(String thisChar){
@@ -128,6 +132,16 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			if(lookupToken(Tokens.currentToken)){
 				storeToken(Tokens.currentToken);
 				charStates(nextCharacter);
+				
+			/*
+			 * 
+			 * 
+			 *  will have to set current position-- ?? so this char doesnt get thrown away, check anywhere else that does this
+			 * 
+			 * 	
+			 */
+				
+				
 			}
 			break;
 

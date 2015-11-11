@@ -6,9 +6,31 @@ import edu.towson.cis.cosc455.ngarrison.project1.interfaces.SyntaxAnalyzer;
 public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public static Stack<String> tokenStack = new Stack<String>();
 	public static Stack<String> supplementalStack = new Stack<String>();
+	
+	public MyLexicalAnalyzer buildParseStack;
+	public boolean created = false;
 
-	//public static int printCount = 1;
 
+public void askForToken(){
+	if(created == false){
+		buildParseStack = new MyLexicalAnalyzer(MyLexicalAnalyzer.completeFile);
+		created = true;
+	} else{
+		buildParseStack.getNextToken(MyLexicalAnalyzer.completeFile);
+	}
+}
+
+public void addToParseStack(){
+	tokenStack.push(MyLexicalAnalyzer.tokenBin);
+	System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
+	System.out.println("SyntaxAnalyzer received token");
+}
+
+public void storeAndReset(){
+	addToParseStack();
+	MyLexicalAnalyzer.tokenBin ="";
+	askForToken();
+}
 
 /*	
 	public static void saveToStack(String token){
@@ -22,75 +44,86 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 		//MyLexicalAnalyzer.getNextToken(MyLexicalAnalyzer.completeFile);
 	}
 */
-
 	/**
 	 * This method implements the BNF grammar rule for the document annotation.
 	 * @throws CompilerException
 	 */
 	public void markdown() throws CompilerException{
 		if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCB)){
-			tokenStack.push(MyLexicalAnalyzer.tokenBin);
-			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
-			//get next token
+			storeAndReset();
 			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.HEAD)){
-			tokenStack.push(MyLexicalAnalyzer.tokenBin);
-			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
-			System.out.println("SyntaxAnalyzer received token");
-			//get next token
+			storeAndReset();
 			head();
+			storeAndReset();
+			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.TITLEB)){
-			tokenStack.push(MyLexicalAnalyzer.tokenBin);
-			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
-			//get next token
+			storeAndReset();
 			title();
+			storeAndReset();
+			markdown();
+			
+			// BREAK HERE AND PUT IN BODY?????
+			
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.PARAB)){
-			tokenStack.push(MyLexicalAnalyzer.tokenBin);
-			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
-			//get next token
+			storeAndReset();
 			paragraph();
+			storeAndReset();
+			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.LISTITEMB)){
-			tokenStack.push(MyLexicalAnalyzer.tokenBin);
-			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
-			//get next token
+			storeAndReset();
 			listitem();
+			storeAndReset();
+			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.NEWLINE)){
-			tokenStack.push(MyLexicalAnalyzer.tokenBin);
-			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
-			//get next token
+			storeAndReset();
 			newline();
+			//get next token
+			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.LINKB)){
 			tokenStack.push(MyLexicalAnalyzer.tokenBin);
 			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			link();
+			//get next token
+			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.AUDIO)){
 			tokenStack.push(MyLexicalAnalyzer.tokenBin);
 			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			audio();
+			//get next token
+			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.VIDEO)){
 			tokenStack.push(MyLexicalAnalyzer.tokenBin);
 			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			video();
+			//get next token
+			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DEFB)){
 			tokenStack.push(MyLexicalAnalyzer.tokenBin);
 			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
 			variableDefine();
+			//get next token
+			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.USEB)){
 			tokenStack.push(MyLexicalAnalyzer.tokenBin);
 			System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 			//get next token
-			variableUse();			
+			variableUse();
+			//get next token
+			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCE)){
 
 			//does it stop here?? and submit doc as is
 			//or check if more tokens and error if so?
 
 		} else{
-			//accept as text
+
+			//get next token
+			markdown();
 		}
 	}
 
@@ -463,12 +496,17 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			} else{
 				tokenStack.push(MyLexicalAnalyzer.tokenBin);
 				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
+			}
+		} else{
+				tokenStack.push(MyLexicalAnalyzer.tokenBin);
+				System.out.println("SyntaxAnalyzer received token" + MyLexicalAnalyzer.tokenBin);
 				//addressText = false;
 				//get next token
+				addressText = true;
+				address();
 			}
 		}
-
-	}
+	
 
 	/**
 	 * This method implements the BNF grammar rule for the newline annotation.

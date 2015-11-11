@@ -9,7 +9,7 @@ public class MyCompiler {
 
 	public static void main(String args[]){
 		System.out.println(completeFile + " --> completeFile at line 11 MyComp");
-		MyLexicalAnalyzer createTokens = new MyLexicalAnalyzer(completeFile);
+		MyLexicalAnalyzer prime = new MyLexicalAnalyzer(completeFile);
 		/*
 		String fileName = "";
 		Scanner input = new Scanner(System.in);
