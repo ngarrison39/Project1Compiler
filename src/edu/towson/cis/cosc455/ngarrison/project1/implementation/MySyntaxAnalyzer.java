@@ -6,46 +6,47 @@ import edu.towson.cis.cosc455.ngarrison.project1.interfaces.SyntaxAnalyzer;
 public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public static Stack<String> tokenStack = new Stack<String>();
 	public static Stack<String> supplementalStack = new Stack<String>();
-	
+
 	public MyLexicalAnalyzer buildParseStack;
 	public boolean created = false;
 	/* Used to check if required text is present*/
 	boolean hasText = false;
-	
+
+	//This was a quick fix because of static/non-static issues 
 	public MySyntaxAnalyzer(){
 		try{
-		markdown();
+			markdown();
 		}
 		catch(CompilerException e){
-			System.out.println("Sorry this doesnt work");
+			System.out.println("CompilerExceptionError");
 		}
 	}
 
 
-public void askForToken(){
-	if(created == false){
-		buildParseStack = new MyLexicalAnalyzer(MyLexicalAnalyzer.completeFile);
-		created = true;
-	} else{
-		buildParseStack.getNextToken(MyLexicalAnalyzer.completeFile);
+	public void askForToken(){
+		if(created == false){
+			buildParseStack = new MyLexicalAnalyzer(MyLexicalAnalyzer.completeFile);
+			created = true;
+		} else{
+			buildParseStack.getNextToken(MyLexicalAnalyzer.completeFile);
+		}
 	}
-}
 
-public void addToParseStack(){
-	tokenStack.push(MyLexicalAnalyzer.tokenBin);
-	System.out.println("SyntaxAnalyzer stored after check token ---> -" + MyLexicalAnalyzer.tokenBin + "-");
-	MyLexicalAnalyzer.tokenBin ="";
-}
+	public void addToParseStack(){
+		tokenStack.push(MyLexicalAnalyzer.tokenBin);
+		System.out.println("SyntaxAnalyzer stored after check token ---> -" + MyLexicalAnalyzer.tokenBin + "-");
+		MyLexicalAnalyzer.tokenBin ="";
+	}
 
 	/**
 	 * This method implements the BNF grammar rule for the document annotation.
 	 * @throws CompilerException
 	 */
 	public void markdown() throws CompilerException{
-		
+
 		System.out.println();
 		System.out.println("checking in markdown -----> -" + MyLexicalAnalyzer.tokenBin + "-");
-		
+
 		if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCB)){
 			addToParseStack();
 			askForToken();
@@ -62,12 +63,68 @@ public void addToParseStack(){
 			head();
 			askForToken();
 			markdown();
-		} 
-		
-		
-		// BREAK HERE AND PUT IN BODY?????
-		
-		else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.PARAB)){
+		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCE)){
+			addToParseStack();
+			System.out.println("******");
+			System.out.println("REACHED END OF SYNTAX ANALYZER");
+			System.out.println("******");
+
+			//does it stop here?? and submit doc as is
+			//or check if more tokens and error if so?
+
+		} else{
+			body();
+		}
+	}
+
+	/**
+	 * This method implements the BNF grammar rule for the head annotation.
+	 * @throws CompilerException
+	 */
+	public void head() throws CompilerException{
+		if(MyLexicalAnalyzer.tokenBin.equals(Tokens.HEAD)){
+			addToParseStack();
+		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.TITLEB)){
+			addToParseStack();
+			title();
+
+			//
+			// WILL WHITESPACE MESS THIS UP? SO ^            ^ WOULD ERROR? or is that acceptable
+			// add an else if(ifOnlySpaces()){ ignore and call head()}
+			askForToken();
+			head();
+		} else{
+			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.exit(1);
+		}		
+	}
+
+	/**
+	 * This method implements the BNF grammar rule for the title annotation.
+	 * @throws CompilerException
+
+	 */
+	public void title() throws CompilerException{
+		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin)){
+			if(MyLexicalAnalyzer.tokenBin.equals(Tokens.TITLEE)){
+				addToParseStack();
+			} else{
+				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.exit(1);
+			}
+		} else{
+			addToParseStack();
+			askForToken();
+			title();
+		}		
+	}
+
+	/**
+	 * This method implements the BNF grammar rule for the body annotation.
+	 * @throws CompilerException
+	 */
+	public void body() throws CompilerException{
+		if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.PARAB)){
 			addToParseStack();
 			askForToken();
 			paragraph();
@@ -110,13 +167,7 @@ public void addToParseStack(){
 			askForToken();
 			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCE)){
-			System.out.println("******");
-			System.out.println("REACHED END OF SYNTAX ANALYZER");
-			System.out.println("******");
-			
-			//does it stop here?? and submit doc as is
-			//or check if more tokens and error if so?
-
+			markdown();	
 		} else{
 			System.out.println("Text type token is -----> -" + MyLexicalAnalyzer.tokenBin + "-");
 			addToParseStack();
@@ -124,56 +175,6 @@ public void addToParseStack(){
 			System.out.println("Token is -----> -" + MyLexicalAnalyzer.tokenBin + "-");
 			markdown();
 		}
-	}
-
-	/**
-	 * This method implements the BNF grammar rule for the head annotation.
-	 * @throws CompilerException
-	 */
-	public void head() throws CompilerException{
-			if(MyLexicalAnalyzer.tokenBin.equals(Tokens.HEAD)){
-				addToParseStack();
-			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.TITLEB)){
-				addToParseStack();
-				title();
-				
-				//
-				// WILL WHITESPACE MESS THIS UP? SO ^            ^ WOULD ERROR? or is that acceptable
-				// add an else if(ifOnlySpaces()){ ignore and call head()}
-				askForToken();
-				head();
-			} else{
-				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
-				System.exit(1);
-			}		
-	}
-
-	/**
-	 * This method implements the BNF grammar rule for the title annotation.
-	 * @throws CompilerException
-
-	 */
-	public void title() throws CompilerException{
-		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin)){ //change to check if token not tag
-			if(MyLexicalAnalyzer.tokenBin.equals(Tokens.TITLEE)){
-				addToParseStack();
-			} else{
-				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
-				System.exit(1);
-			}
-		} else{
-			addToParseStack();
-			askForToken();
-			title();
-		}		
-	}
-
-	/**
-	 * This method implements the BNF grammar rule for the body annotation.
-	 * @throws CompilerException
-	 */
-	public void body() throws CompilerException{
-
 	}
 
 	/**
@@ -267,7 +268,39 @@ public void addToParseStack(){
 	 * @throws CompilerException
 	 */
 	public void variableDefine() throws CompilerException{
-		//will need a method to strip only white space for in between =
+		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.EQSIGN) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.DEFUSEE)){
+			//Cannot have other tokens here
+			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.exit(1);
+
+		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.EQSIGN)){
+			if(hasText == false){
+				//Must contain text for variable name
+				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.exit(1);
+
+			} else{
+				addToParseStack();
+				hasText = false;
+				askForToken();
+				variableDefine();
+			}
+		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.DEFUSEE)){
+			if(hasText == false){
+				//Must contain text for variable definition
+				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.exit(1);
+
+			} else{
+				addToParseStack();
+				hasText = false;
+			}
+		} else{
+			addToParseStack();
+			hasText = true;
+			askForToken();
+			address();
+		}
 	}
 
 	/**
@@ -275,8 +308,27 @@ public void addToParseStack(){
 	 * @throws CompilerException
 	 */
 	public void variableUse() throws CompilerException{
-		//will need a method to strip only white space for in between =
+		if(Tokens.isToken(MyLexicalAnalyzer.tokenBin) && !MyLexicalAnalyzer.tokenBin.equals(Tokens.DEFUSEE)){
+			//Cannot have other tokens here
+			System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+			System.exit(1);
 
+		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.DEFUSEE)){
+			if(hasText == false){
+				//Must contain text for variable name
+				System.out.println("Syntax error: does not follow markdown structure. Exiting conversion ");
+				System.exit(1);
+
+			} else{
+				addToParseStack();
+				hasText = false;
+			}
+		} else{
+			addToParseStack();
+			hasText = true;
+			askForToken();
+			variableUse();
+		}
 	}
 
 	/**
@@ -464,9 +516,9 @@ public void addToParseStack(){
 			hasText = true;
 			askForToken();
 			address();
-			}
 		}
-	
+	}
+
 
 	/**
 	 * This method implements the BNF grammar rule for the newline annotation.
@@ -475,6 +527,15 @@ public void addToParseStack(){
 	public void newline() throws CompilerException{
 
 		//do you even need this?? theres nothing else to do for it
+	}
+
+	public boolean allSpaces(String c){
+		for(int i = 0; i < c.length(); i++){
+			if(!String.valueOf(c.charAt(i)).equals(" ")){
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

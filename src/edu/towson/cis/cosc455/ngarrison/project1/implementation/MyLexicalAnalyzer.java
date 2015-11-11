@@ -60,6 +60,10 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			if(lookupToken(Tokens.currentToken)){
 				System.out.println("---->" + Tokens.currentToken + "<-----");
 				storeToken(Tokens.currentToken);
+				while(!MySyntaxAnalyzer.tokenStack.isEmpty()){
+					System.out.println("--------------------------------------");
+					System.out.println(MySyntaxAnalyzer.tokenStack.pop());
+				}
 			}
 		}  
 	}
