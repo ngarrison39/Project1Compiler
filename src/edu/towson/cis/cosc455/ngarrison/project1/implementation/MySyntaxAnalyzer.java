@@ -31,11 +31,18 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 
 
 	public void askForToken(){
+		if(MyLexicalAnalyzer.reachedEnd == true){
+			if(endReceived == false){
+				System.out.println("Syntax error: #END was not found in the file. Exiting conversion ");
+				System.exit(1);
+			}
+		} else{
 		if(created == false){
 			buildParseStack = new MyLexicalAnalyzer(MyLexicalAnalyzer.completeFile);
 			created = true;
 		} else{
 			buildParseStack.getNextToken(MyLexicalAnalyzer.completeFile);
+		}
 		}
 	}
 
@@ -88,10 +95,6 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 				System.out.println("******");
 				System.out.println("REACHED END OF SYNTAX ANALYZER");
 				System.out.println("******");
-
-				//does it stop here?? and submit doc as is
-				//or check if more tokens and error if so?
-
 			}
 		}else{
 			body();
@@ -556,5 +559,4 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 		}
 		return true;
 	}
-
 }
