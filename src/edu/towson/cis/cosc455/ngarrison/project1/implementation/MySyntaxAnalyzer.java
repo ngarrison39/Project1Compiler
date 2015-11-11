@@ -18,10 +18,13 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	boolean beginReceived = false;
 	/* Used to check if #END used in file*/
 	boolean endReceived = false;
+	
+	public int primer = 0;
 
 	//This was a quick fix because of static/non-static issues 
 	public MySyntaxAnalyzer(){
 		try{
+			primer = 1;
 			markdown();
 		}
 		catch(CompilerException e){
@@ -47,8 +50,18 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	}
 
 	public void addToParseStack(){
-		tokenStack.push(MyLexicalAnalyzer.tokenBin);
+		if(primer != 1){
+			tokenStack.push(MyLexicalAnalyzer.tokenBin);
+			MyLexicalAnalyzer.tokenBin ="";	
+		}
+		/*
+		 * Do not save when primer == 1 or token will be saved twice.
+		 * Not a good way to do this but issues with creating Class object because static/non-static issues
+		 * Tried to have Lexical Analyzer prime with the first token and Syntax Analyzer ask for tokens after primed
+		 * Time constraints prevent fixing this at this time
+		 */
 		MyLexicalAnalyzer.tokenBin ="";
+		primer = 0;
 	}
 
 	/**
@@ -81,6 +94,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCE)){
 			beginReceived = true;
+			MyLexicalAnalyzer.reachedEnd = true;
 			addToParseStack();
 			if(beginReceived ==false){
 				System.out.println("Syntax error: #BEGIN was not found in the file. Exiting conversion ");
