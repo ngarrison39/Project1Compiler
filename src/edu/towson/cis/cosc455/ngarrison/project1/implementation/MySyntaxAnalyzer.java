@@ -23,6 +23,11 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	boolean endReceived = false;
 	
 	public int primer = 0;
+	
+	String temp = "";
+	public static Stack<String> tempStack = new Stack<String>();
+	
+	
 
 	//This was a quick fix because of static/non-static issues 
 	public MySyntaxAnalyzer(){
@@ -117,6 +122,17 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 				System.out.println("******");
 				System.out.println("REACHED END OF SYNTAX ANALYZER");
 				System.out.println("******");
+				
+				while(!tokenStack.isEmpty()){
+					temp = tokenStack.pop();
+					System.out.println("|" + temp + "|");
+					System.out.println("----------");
+					tempStack.push(temp);
+				}
+				while(!tempStack.isEmpty()){
+					temp = tempStack.pop();
+					tokenStack.push(temp);
+				}
 			}
 		}else{
 			body();

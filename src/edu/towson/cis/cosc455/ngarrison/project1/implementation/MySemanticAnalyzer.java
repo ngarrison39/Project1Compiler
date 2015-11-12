@@ -60,35 +60,65 @@ public class MySemanticAnalyzer {
 				outputStack.push(varName);
 				temp = MySyntaxAnalyzer.tokenStack.pop();
 				outputStack.push(temp);
-				if(temp.equals(Tokens.DEFB)){
+				if(temp.equals(Tokens.EQSIGN)){
+					System.out.println("Ignoring the equal sign and reset");
 					MySyntaxAnalyzer.tokenStack.push(CURRENTHOLDER);
 					varName ="";
 					removeLowerBound();
 					//break???
 					variableCheck();
 				} else if(temp.equals(Tokens.USEB)){
+					
+					System.out.println("Sending to searchForDefine with var name =" + varName);
+					
 					searchForDefine();
 				}
 			} else{
 				outputStack.push(temp);
 			}	
 		}
+		System.out.println();
+		System.out.println();
+		
+		while(!outputStack.isEmpty()){
+			System.out.println(outputStack.pop());
+			System.out.println("------------------------");
+		}
+		
 		convertToHTML();
 	}
 	
 	public void variableReplace(){
 		while(!temp.equals(LOWERPLACEHOLDER)){
+			
+			System.out.println("At top of replace method token is -" + temp + "-");
+			
 			if(temp.equals(IGNOREBLOCK)){
 				temp = outputStack.pop();
 				ignoreBlockReplace();
+			} else if(temp.equals(Tokens.DOCE)){
+				MySyntaxAnalyzer.tokenStack.push(temp);
+				break;
 			} else if(temp.equals(Tokens.USEB)){
-				//do nothing and ignore the $USE
-				//ignore the variable name
-				outputStack.pop();
+				MySyntaxAnalyzer.tokenStack.push(temp);
+				temp = outputStack.pop();
+				if(ignoreSpaces(temp).equals(ignoreSpaces(varName))){
+				//do nothing with temp to drop the variable name
+				//pop once off this stack to drop the $USE
+				MySyntaxAnalyzer.tokenStack.pop();
+				
 				//insert the corresponding variable value
 				MySyntaxAnalyzer.tokenStack.push(variableDef);
+				
 				//ignore the $END
-				outputStack.pop();
+				System.out.println("Should ignore $END ----" + outputStack.pop());
+				
+				temp = outputStack.pop();
+				} else{
+					MySyntaxAnalyzer.tokenStack.push(temp);
+					temp = outputStack.pop();
+				}
+				
 			} else{
 				MySyntaxAnalyzer.tokenStack.push(temp);
 				temp = outputStack.pop();
@@ -100,10 +130,19 @@ public class MySemanticAnalyzer {
 	public void searchForDefine(){
 		while(!MySyntaxAnalyzer.tokenStack.isEmpty()){
 			temp = MySyntaxAnalyzer.tokenStack.pop();
-			System.out.println("----" + temp + "----");
+			outputStack.push(temp);
+			
+			System.out.println(" From Syntax Stack----" + temp + "----");
+			
 			if(temp.equals(Tokens.PARAE)){
+				
+				System.out.println("Went to ignore block");
+				
 				ignoreBlockSearch();
-			} else if(temp.equals(Tokens.DEFB)){
+			} else if(temp.equals(Tokens.EQSIGN)){
+				
+				System.out.println("Found in Syntax Stack the variable definition after   " + temp);
+				System.out.println("variable name right now is -" + varName + "-");
 				
 				//MySyntaxAnalyzer.tokenStack.push(CURRENTHOLDER);
 				
@@ -111,18 +150,44 @@ public class MySemanticAnalyzer {
 				 *but there is no definition at the beginning of the (paragraph) block
 				 *will have to ignore when converting to html
 				 */
-				MySyntaxAnalyzer.tokenStack.push(temp);
-				temp = outputStack.pop();
+				temp = MySyntaxAnalyzer.tokenStack.pop();
+				
+				System.out.println("from syntax analyzer temp should be varName -" + temp + "-");
+				
+				
+				//MySyntaxAnalyzer.tokenStack.push(temp);
+				//temp = outputStack.pop();
+				
 				if(ignoreSpaces(temp).equals(ignoreSpaces(varName))){
+					
+					System.out.println("The variable names matched   " + temp);
+					
 					MySyntaxAnalyzer.tokenStack.push(temp);
+					
 					//stores equals sign
-					MySyntaxAnalyzer.tokenStack.push(outputStack.pop());
-					variableDef = outputStack.pop();
-					//stores #END
-					MySyntaxAnalyzer.tokenStack.push(outputStack.pop());
 					temp = outputStack.pop();
+					MySyntaxAnalyzer.tokenStack.push(temp);
+					
+					System.out.println("The temp should have been =  -" + temp + "-");
+					
+					//gets the variable definition
+					temp = outputStack.pop();
+					MySyntaxAnalyzer.tokenStack.push(temp);
+					variableDef = temp;
+					
+					//stores $END
+					temp = outputStack.pop();
+					MySyntaxAnalyzer.tokenStack.push(temp);
+					
+					System.out.println("Did it store the $END????  :" + temp);
+					
+					
+					temp = outputStack.pop();
+					
+					System.out.println("temp before replace method  -" + temp + "-");
+					
 					variableReplace();
-					//break;
+					break;
 				}
 			} else if(temp.equals(Tokens.DOCB)){
 				System.out.println("Semantic error: " + varName + " is undefined.  Exiting conversion process.");
@@ -163,6 +228,7 @@ public class MySemanticAnalyzer {
 					outputStack.push(temp);
 					temp = MySyntaxAnalyzer.tokenStack.pop();
 				}
+				break;
 			} else{
 				MySyntaxAnalyzer.tokenStack.push(temp);
 			}
@@ -179,9 +245,9 @@ public class MySemanticAnalyzer {
 			return noSpace;
 	}
 	public void convertToHTML(){
-		while(!outputStack.isEmpty()){
+		/*while(!outputStack.isEmpty()){
 			System.out.println("Semantic ---->" + outputStack.pop() + "<-----");
-		}
+		}*/
 		/*
 		if(!outputStack.isEmpty()){
 			temp = outputStack.pop();
