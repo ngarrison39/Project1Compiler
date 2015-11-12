@@ -5,7 +5,8 @@ import edu.towson.cis.cosc455.ngarrison.project1.interfaces.SyntaxAnalyzer;
 
 public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public static Stack<String> tokenStack = new Stack<String>();
-	public static Stack<String> supplementalStack = new Stack<String>();
+	
+	//public static Stack<String> supplementalStack = new Stack<String>();
 
 	public MyLexicalAnalyzer buildParseStack;
 	public boolean created = false;
@@ -53,7 +54,9 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 
 	public void addToParseStack(){
 		if(primer != 1){
+			if(!allSpaces(MyLexicalAnalyzer.tokenBin)){
 			tokenCounter++;
+		}
 			tokenStack.push(MyLexicalAnalyzer.tokenBin);
 			System.out.println();
 			System.out.println("Successfully added token, token is ---> -" + MyLexicalAnalyzer.tokenBin + "-");
@@ -99,10 +102,16 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			askForToken();
 			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCE)){
-			beginReceived = true;
-			MyLexicalAnalyzer.reachedEnd = true;
+			endReceived = true;
 			addToParseStack();
-			if(beginReceived ==false){
+			while(MyLexicalAnalyzer.reachedEnd != true){
+			askForToken();
+			if(!allSpaces(MyLexicalAnalyzer.tokenBin)){
+				System.out.println("Syntax error: annotations were found after #END annotation. Exiting conversion ");
+				System.exit(1);
+			}
+			}
+				if(beginReceived == false){
 				System.out.println("Syntax error: #BEGIN was not found in the file. Exiting conversion ");
 				System.exit(1);
 			}
@@ -225,6 +234,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	 */
 	public void paragraph() throws CompilerException{
 		if(MyLexicalAnalyzer.tokenBin.equals(Tokens.DEFB)){
+			System.out.println("what is this point -" + MyLexicalAnalyzer.tokenBin + "-");
 			addToParseStack();
 			askForToken();
 			variableDefine();
@@ -232,6 +242,10 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			paragraph();
 		} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.PARAE)){
 			addToParseStack();
+		} else if(allSpaces(MyLexicalAnalyzer.tokenBin)){ 
+			addToParseStack();
+			askForToken();
+			paragraph();
 		} else{
 			innerText();
 		}			
