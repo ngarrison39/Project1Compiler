@@ -1,17 +1,18 @@
 package edu.towson.cis.cosc455.ngarrison.project1.implementation;
 
-import java.util.Queue;
 import java.util.Stack;
-import java.util.HashMap;
 
 public class MySemanticAnalyzer {
+	public MySemanticAnalyzer(){
+		variableCheck();
+	}
+	
 	public Stack<String> outputStack = new Stack<String>();
-	//public Stack<String> tempStack = new Stack<String>();
-	public Queue<String> html;
 	
 	String temp;
 	String varName;
 	String variableDef;
+	String outputString;
 	/* Used when mapping to html for begin/end tags that are the same: *, **, ^ */
 	boolean beginTagUsed = false;
 	
@@ -19,7 +20,9 @@ public class MySemanticAnalyzer {
 	final String LOWERPLACEHOLDER = "~~*LOWER*~~";
 	final String CURRENTHOLDER = "~~*CURRENT*~~";
 	final String IGNOREBLOCK = "~~*IGNORE*~~";
-    HashMap<String, String> hmap = new HashMap<String, String>();
+    
+	/*
+	HashMap<String, String> hmap = new HashMap<String, String>();
 
     public void mapValues(){
     hmap.put("#BEGIN", "<html>");
@@ -44,6 +47,7 @@ public class MySemanticAnalyzer {
     hmap.put("AUDIO", "<html>");
     $DEF $USE
     }
+    */
 	
 	
 	public void variableCheck(){
@@ -96,6 +100,7 @@ public class MySemanticAnalyzer {
 	public void searchForDefine(){
 		while(!MySyntaxAnalyzer.tokenStack.isEmpty()){
 			temp = MySyntaxAnalyzer.tokenStack.pop();
+			System.out.println("----" + temp + "----");
 			if(temp.equals(Tokens.PARAE)){
 				ignoreBlockSearch();
 			} else if(temp.equals(Tokens.DEFB)){
@@ -108,7 +113,7 @@ public class MySemanticAnalyzer {
 				 */
 				MySyntaxAnalyzer.tokenStack.push(temp);
 				temp = outputStack.pop();
-				if(temp.equals(varName)){
+				if(ignoreSpaces(temp).equals(ignoreSpaces(varName))){
 					MySyntaxAnalyzer.tokenStack.push(temp);
 					//stores equals sign
 					MySyntaxAnalyzer.tokenStack.push(outputStack.pop());
@@ -117,9 +122,10 @@ public class MySemanticAnalyzer {
 					MySyntaxAnalyzer.tokenStack.push(outputStack.pop());
 					temp = outputStack.pop();
 					variableReplace();
+					//break;
 				}
 			} else if(temp.equals(Tokens.DOCB)){
-				System.out.println("Semantic error: " + temp + " is undefined.  Exiting conversion process.");
+				System.out.println("Semantic error: " + varName + " is undefined.  Exiting conversion process.");
 				System.exit(1);
 			}
 		}
@@ -161,22 +167,38 @@ public class MySemanticAnalyzer {
 				MySyntaxAnalyzer.tokenStack.push(temp);
 			}
 		}
-
+	}
+		
+		public String ignoreSpaces(String name){
+			String noSpace = "";
+			for(int i = 0; i < name.length(); i++){
+				if(!String.valueOf(name.charAt(i)).equals(" ")){
+					noSpace = noSpace + String.valueOf(name.charAt(i));
+				}
+			}
+			return noSpace;
 	}
 	public void convertToHTML(){
 		while(!outputStack.isEmpty()){
+			System.out.println("Semantic ---->" + outputStack.pop() + "<-----");
+		}
+		/*
+		if(!outputStack.isEmpty()){
 			temp = outputStack.pop();
+		}
+
 			switch (temp) {
 			case Tokens.DOCB:
 				
 				break;
 			//ignore these two cases, they are not used for html output
-			case Tokens.DEFB:				
-			case Tokens.DEFUSEE:
+			case Tokens.DEFB:
+				outputStack.pop();
+				outputStack.pop();
 				
 				break;
 			case Tokens.HEAD:  
-				html.enqueue("<h>");
+				//html.enqueue("<h>");
 			case Tokens.TITLEB:  
 				//for single character token TITLEB
 			case Tokens.TITLEE:  
@@ -240,6 +262,7 @@ public class MySemanticAnalyzer {
 				}
 				break;
 			}
+			*/
 	}
 
 }

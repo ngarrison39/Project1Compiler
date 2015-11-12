@@ -58,13 +58,10 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 		}
 		else if(currentPosition == completeFile.length()){
 			if(reachedEnd != true){
-			System.out.println("reached end of document -------------------- getCharacter MyLex");
 			if(noSpecialTags(Tokens.currentToken)){
-				System.out.println("---->" + Tokens.currentToken + "<-----");
 				storeToken(Tokens.currentToken);
 				reachedEnd = true;
 			} else if(lookupToken(Tokens.currentToken)){
-				System.out.println("---->" + Tokens.currentToken + "<-----");
 				storeToken(Tokens.currentToken);
 				reachedEnd = true;
 			}
@@ -135,7 +132,7 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			addCharacter(thisChar);
 			getCharacter(completeFile);
 			while(!isSpace(nextCharacter)){
-				addCharacter(nextCharacter);
+				addCharacter(nextCharacter.toUpperCase());
 				getCharacter(completeFile);
 				if(reachedEnd == true){
 					break;

@@ -58,9 +58,6 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			tokenCounter++;
 		}
 			tokenStack.push(MyLexicalAnalyzer.tokenBin);
-			System.out.println();
-			System.out.println("Successfully added token, token is ---> -" + MyLexicalAnalyzer.tokenBin + "-");
-			System.out.println();
 			MyLexicalAnalyzer.tokenBin ="";	
 		}
 		/*
@@ -116,10 +113,6 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 				System.exit(1);
 			}
 			else{
-				while(!tokenStack.isEmpty()){
-					System.out.println("--------------------------------------");
-					System.out.println(tokenStack.pop());
-				}
 				System.out.println();
 				System.out.println("******");
 				System.out.println("REACHED END OF SYNTAX ANALYZER");
@@ -234,7 +227,6 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	 */
 	public void paragraph() throws CompilerException{
 		if(MyLexicalAnalyzer.tokenBin.equals(Tokens.DEFB)){
-			System.out.println("what is this point -" + MyLexicalAnalyzer.tokenBin + "-");
 			addToParseStack();
 			askForToken();
 			variableDefine();
@@ -302,7 +294,6 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			} else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.USEB)){
 				addToParseStack();
 				askForToken();
-				System.out.println("sending token to variableUse() token is ---> -" + MyLexicalAnalyzer.tokenBin + "-");
 				variableUse();
 				askForToken();
 				innerText();
@@ -381,11 +372,9 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 				hasText = false;
 			}
 		} else{
-			System.out.println("just added in variableUse() token is ---> -" + MyLexicalAnalyzer.tokenBin + "-");
 			addToParseStack();
 			hasText = true;
 			askForToken();
-			System.out.println("sending next token back to variableUse() token is ---> -" + MyLexicalAnalyzer.tokenBin + "-");
 			variableUse();
 		}
 	}
@@ -467,7 +456,6 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			}  else if(MyLexicalAnalyzer.tokenBin.equals(Tokens.USEB)){
 				addToParseStack();
 				askForToken();
-				System.out.println("sending token to variableUse() token is ---> -" + MyLexicalAnalyzer.tokenBin + "-");
 				variableUse();
 				askForToken();
 				innerItem();

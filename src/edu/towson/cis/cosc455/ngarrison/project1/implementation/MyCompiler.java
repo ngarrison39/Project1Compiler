@@ -9,13 +9,13 @@ public class MyCompiler {
 ///*	
 	//public static String completeFile = "#BEGIN ^header here^ $DEF = @%* afga @ % * ~ { ] [ } [erw] {erg } ; gc*gc%gc@gc(gc;gc^gc**gc-gc=gc?  this should be text **bold here** #END";
 	//public static String completeFile = "#BEGIN ^<simple  test>^ { ** bold here ** } *italics here* plain text @(http://www.help.com) #END";
-	public static String completeFile = "#BEGIN      { $DEF lastname = Simpson $END The members of the $USE name $END family are: + Homer $USE name $END ; + Marge $USE lastname $END ; + Bart $USE lastname $END ; + Lisa $USE lastname $END ; + Maggie $USE lastname $END ; }{The members of the $USE name $END extended family are: + Abe $USE name $END ; + Mona $USE name $END ; } #END ";
-
+	//public static String completeFile = "#BEGIN      { $DEF lastname = Simpson $END The members of the $USE name $END family are: + Homer $USE name $END ; + Marge $USE lastname $END ; + Bart $USE lastname $END ; + Lisa $USE lastname $END ; + Maggie $USE lastname $END ; }{The members of the $USE name $END extended family are: + Abe $USE name $END ; + Mona $USE name $END ; } #END ";
+	public static String completeFile = "#BEGIN      { $DEF lastname  = Simpson $END The members of the $USE lastname $END family are: + Homer $USE lastname $END ; + Marge $USE lastname  $END ; + Bart $USE lastname  $END ; + Lisa $USE lastname  $END ; + Maggie $USE lastname  $END ; }#END ";
 	public static void main(String args[]){
 		System.out.println(completeFile + " --> completeFile at line 11 MyComp");
 		MyLexicalAnalyzer prime = new MyLexicalAnalyzer(completeFile);
 		MySyntaxAnalyzer  build = new MySyntaxAnalyzer();
-		//MySemanticAnalyzer convert = new MySemanticAnalyzer();
+		MySemanticAnalyzer convert = new MySemanticAnalyzer();
 	}
 	// */
 	/*
