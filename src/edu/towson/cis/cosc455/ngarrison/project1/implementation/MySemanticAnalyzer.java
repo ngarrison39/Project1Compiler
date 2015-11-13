@@ -13,7 +13,6 @@ public class MySemanticAnalyzer {
 		convertToHTML();
 	}
 
-	//File outputFile = new File();
 	public Stack<String> outputStack = new Stack<String>();
 
 	String temp;
@@ -34,9 +33,6 @@ public class MySemanticAnalyzer {
 	public void variableCheck(){
 		while(!MySyntaxAnalyzer.tokenStack.isEmpty()){
 			temp = MySyntaxAnalyzer.tokenStack.pop();
-			
-			System.out.println("What is temp -----" + temp);
-			
 			if(temp.equals(Tokens.DEFUSEE)){
 				outputStack.push(LOWERPLACEHOLDER);
 				outputStack.push(temp);
@@ -49,9 +45,7 @@ public class MySemanticAnalyzer {
 					varName ="";
 					removeLowerBound();
 				} else if(temp.equals(Tokens.USEB)){
-					
-					System.out.println("What are you searching for here??   " + varName);
-					
+					canResolve(varName);
 					searchForDefine();
 				}
 			} else{
@@ -106,9 +100,6 @@ public class MySemanticAnalyzer {
 				 *will have to ignore when converting to html
 				 */
 				temp = MySyntaxAnalyzer.tokenStack.pop();
-				
-				System.out.println("Checking temp --" + temp + "-- against varName --" + varName + "--");
-				
 				if(ignoreSpaces(temp).equals(ignoreSpaces(varName))){
 					MySyntaxAnalyzer.tokenStack.push(temp);
 					//stores equals sign
@@ -187,6 +178,19 @@ public class MySemanticAnalyzer {
 		}
 		return noSpace;
 	}
+	
+	public boolean canResolve(String variableName){
+		temp = variableName.trim();
+		for(int i = 0; i < temp.length(); i++){
+			if(String.valueOf(temp.charAt(i)).equals(" ")){
+				System.out.println("Semantic error: Unable to resolve variable name \"" + temp + "\".  Exiting compiler");
+				System.exit(1);
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	public void convertToHTML(){
 		if(!outputStack.isEmpty()){
 			temp = outputStack.pop();
@@ -203,10 +207,10 @@ public class MySemanticAnalyzer {
 			
 			BufferedWriter output = null;
 	        try {
-	            File file = new File("outputFile.txt");
+	            File file = new File("outputFile.html");
 	            output = new BufferedWriter(new FileWriter(file));
 	            output.write(outputString);
-	            openHTMLFileInBrowswer("outputFile.txt");
+	            openHTMLFileInBrowswer("outputFile.html");
 	        } catch ( IOException e ) {
 	            e.printStackTrace();
 	        } finally {

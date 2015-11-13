@@ -6,10 +6,14 @@ import edu.towson.cis.cosc455.ngarrison.project1.interfaces.SyntaxAnalyzer;
 public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public static Stack<String> tokenStack = new Stack<String>();
 	
-	//public static Stack<String> supplementalStack = new Stack<String>();
-
 	public MyLexicalAnalyzer buildParseStack;
 	public boolean created = false;
+	/* will be used to make sure the definition is only at the beginning of a paragraph block */
+	boolean allowParDef = false;
+	/* will be used to make sure the definition is only directly after the #BEGIN token */
+	boolean allowBeginDef = false;
+	/* used to check position of $DEF in terms of #BEGIN or PARAB */
+	int defPositinon;
 	
 	int tokenCount = 0;
 
@@ -25,7 +29,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public int primer = 0;
 	
 	String temp = "";
-	public static Stack<String> tempStack = new Stack<String>();
+    public static Stack<String> tempStack = new Stack<String>();
 	
 	
 
@@ -82,22 +86,28 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	public void markdown() throws CompilerException{
 		if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCB)){
 			if(tokenCounter != 0){
-				System.out.println("Syntax error: #BEGIN does not start the file. Exiting conversion ");
+				System.out.println("Syntax error: #BEGIN must be at start of document. Exiting conversion ");
 				System.exit(1);
 			}
 			else{
 				beginReceived = true;
 				addToParseStack();
+				allowBeginDef = true;
 				askForToken();
 				markdown();
 			}
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DEFB)){
+			if(allowBeginDef != true){
+				System.out.println("Syntax error: $DEF must be directly after #BEGIN. Exiting conversion ");
+				System.exit(1);
+			}
 			addToParseStack();
 			askForToken();
 			variableDefine();
 			askForToken();
 			markdown();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.HEAD)){
+			allowBeginDef = false;
 			addToParseStack();
 			askForToken();
 			head();
@@ -111,28 +121,30 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			if(!allSpaces(MyLexicalAnalyzer.tokenBin)){
 				System.out.println("Syntax error: annotations were found after #END annotation. Exiting conversion ");
 				System.exit(1);
+			} 
+			
+			
+			
+			else{
+				while(!tokenStack.isEmpty()){
+										temp = tokenStack.pop();
+										System.out.println("|" + temp + "|");
+										System.out.println("----------");
+										tempStack.push(temp);
+									}
+									while(!tempStack.isEmpty()){
+										temp = tempStack.pop();
+										tokenStack.push(temp);
+									}
 			}
+			
+			
+			
+			
 			}
 				if(beginReceived == false){
 				System.out.println("Syntax error: #BEGIN was not found in the file. Exiting conversion ");
 				System.exit(1);
-			}
-			else{
-				System.out.println();
-				System.out.println("******");
-				System.out.println("REACHED END OF SYNTAX ANALYZER");
-				System.out.println("******");
-				
-				while(!tokenStack.isEmpty()){
-					temp = tokenStack.pop();
-					System.out.println("|" + temp + "|");
-					System.out.println("----------");
-					tempStack.push(temp);
-				}
-				while(!tempStack.isEmpty()){
-					temp = tempStack.pop();
-					tokenStack.push(temp);
-				}
 			}
 		}else{
 			body();
@@ -186,51 +198,57 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	 * @throws CompilerException
 	 */
 	public void body() throws CompilerException{
+	if(Tokens.isToken(MyLexicalAnalyzer.tokenBin)){
 		if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.PARAB)){
 			addToParseStack();
+			allowParDef = true;
 			askForToken();
 			paragraph();
 			askForToken();
-			markdown();
+			body();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.LISTITEMB)){
 			addToParseStack();
 			askForToken();
 			listitem();
 			askForToken();
-			markdown();
+			body();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.NEWLINE)){
 			addToParseStack();
 			askForToken();
 			newline();
 			askForToken();
-			markdown();
+			body();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.LINKB)){
 			addToParseStack();
 			askForToken();
 			link();
 			askForToken();
-			markdown();
+			body();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.AUDIO)){
 			addToParseStack();
 			askForToken();
 			audio();
 			askForToken();
-			markdown();
+			body();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.VIDEO)){
 			addToParseStack();
 			askForToken();
 			video();
 			askForToken();
-			markdown();
+			body();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.USEB)){
 			addToParseStack();
 			askForToken();
 			variableUse();
 			askForToken();
-			markdown();
+			body();
 		} else if(MyLexicalAnalyzer.tokenBin.equalsIgnoreCase(Tokens.DOCE)){
 			markdown();	
 		} else{
+			System.out.println("Syntax error token #" + tokenCounter + " : " + MyLexicalAnalyzer.tokenBin + "  does not follow markdown structure at this position. Exiting conversion ");
+			System.exit(1);
+		}
+	} else{
 			addToParseStack();
 			askForToken();
 			markdown();
@@ -243,6 +261,10 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 	 */
 	public void paragraph() throws CompilerException{
 		if(MyLexicalAnalyzer.tokenBin.equals(Tokens.DEFB)){
+			if(allowParDef != true){
+				System.out.println("Syntax error: $DEF must be directly after #BEGIN. Exiting conversion ");
+				System.exit(1);
+			}
 			addToParseStack();
 			askForToken();
 			variableDefine();
@@ -255,6 +277,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			askForToken();
 			paragraph();
 		} else{
+			allowParDef = false;
 			innerText();
 		}			
 	}
