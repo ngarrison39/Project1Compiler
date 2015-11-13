@@ -1,18 +1,26 @@
 package edu.towson.cis.cosc455.ngarrison.project1.implementation;
 
 import java.util.Stack;
+import java.awt.Desktop;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class MySemanticAnalyzer {
 	public MySemanticAnalyzer(){
 		variableCheck();
+		convertToHTML();
 	}
 
+	//File outputFile = new File();
 	public Stack<String> outputStack = new Stack<String>();
 
 	String temp;
 	String varName;
 	String variableDef;
 	String outputString;
+	
 	/* Used when mapping to html for begin/end tags that are the same: *, **, ^ */
 	boolean closeHead = false;
 	boolean closeItalics = false;
@@ -23,38 +31,12 @@ public class MySemanticAnalyzer {
 	final String CURRENTHOLDER = "~~*CURRENT*~~";
 	final String IGNOREBLOCK = "~~*IGNORE*~~";
 
-	/*
-	HashMap<String, String> hmap = new HashMap<String, String>();
-
-    public void mapValues(){
-    hmap.put("#BEGIN", "<html>");
-    hmap.put("#END", "</html>");
-    hmap.put("TITLEB", "<title>");
-    hmap.put("TITLEE", "</title>");
-    hmap.put("PARAB", "<p>");
-    hmap.put("PARAE", "</p>");
-    hmap.put("LISTITEMB", "<li>");
-    hmap.put("LISTITEME", "</li>");
-    hmap.put("NEWLINE", "<br>");
-
-
-    hmap.put("LINKB", "<html>");
-    hmap.put("LINKE", "</a>");
-
-
-    hmap.put("AUDIO", "<audio controls><source src =\"");
-    hmap.put("VIDEO", "<html>");
-    hmap.put("ADDRESSB", "<html>");
-    hmap.put("ADDRESSE", "<html>");
-    hmap.put("AUDIO", "<html>");
-    $DEF $USE
-    }
-	 */
-
-
 	public void variableCheck(){
 		while(!MySyntaxAnalyzer.tokenStack.isEmpty()){
 			temp = MySyntaxAnalyzer.tokenStack.pop();
+			
+			System.out.println("What is temp -----" + temp);
+			
 			if(temp.equals(Tokens.DEFUSEE)){
 				outputStack.push(LOWERPLACEHOLDER);
 				outputStack.push(temp);
@@ -63,48 +45,27 @@ public class MySemanticAnalyzer {
 				temp = MySyntaxAnalyzer.tokenStack.pop();
 				outputStack.push(temp);
 				if(temp.equals(Tokens.EQSIGN)){
-					System.out.println("Ignoring the equal sign and reset");
 					MySyntaxAnalyzer.tokenStack.push(CURRENTHOLDER);
 					varName ="";
 					removeLowerBound();
-					//break???
-					variableCheck();
 				} else if(temp.equals(Tokens.USEB)){
-
-					System.out.println("Sending to searchForDefine with var name =" + varName);
-
+					
+					System.out.println("What are you searching for here??   " + varName);
+					
 					searchForDefine();
 				}
 			} else{
 				outputStack.push(temp);
 			}	
 		}
-		
-	/*	
-		
-		System.out.println();
-		System.out.println();
-
-		while(!outputStack.isEmpty()){
-			System.out.println(outputStack.pop());
-			System.out.println("------------------------");
-			
-	*/	
-		convertToHTML();
-		}
+	}
 
 	public void variableReplace(){
 		while(!temp.equals(LOWERPLACEHOLDER)){
-
-			System.out.println("At top of replace method token is -" + temp + "-");
-
 			if(temp.equals(IGNOREBLOCK)){
 				temp = outputStack.pop();
 				ignoreBlockReplace();
-			} else if(temp.equals(Tokens.DOCE)){
-				MySyntaxAnalyzer.tokenStack.push(temp);
-				break;
-			} else if(temp.equals(Tokens.USEB)){
+			}  else if(temp.equals(Tokens.USEB)){
 				MySyntaxAnalyzer.tokenStack.push(temp);
 				temp = outputStack.pop();
 				if(ignoreSpaces(temp).equals(ignoreSpaces(varName))){
@@ -116,7 +77,7 @@ public class MySemanticAnalyzer {
 					MySyntaxAnalyzer.tokenStack.push(variableDef);
 
 					//ignore the $END
-					System.out.println("Should ignore $END ----" + outputStack.pop());
+					outputStack.pop();
 
 					temp = outputStack.pop();
 				} else{
@@ -136,65 +97,40 @@ public class MySemanticAnalyzer {
 		while(!MySyntaxAnalyzer.tokenStack.isEmpty()){
 			temp = MySyntaxAnalyzer.tokenStack.pop();
 			outputStack.push(temp);
-
-			System.out.println(" From Syntax Stack----" + temp + "----");
-
+			System.out.println("Checking temp --" + temp + "-- against varName --" + varName + "--");
 			if(temp.equals(Tokens.PARAE)){
-
-				System.out.println("Went to ignore block");
-
-				ignoreBlockSearch();
+				ignoreBlockSearch();				
 			} else if(temp.equals(Tokens.EQSIGN)){
-
-				System.out.println("Found in Syntax Stack the variable definition after   " + temp);
-				System.out.println("variable name right now is -" + varName + "-");
-
-				//MySyntaxAnalyzer.tokenStack.push(CURRENTHOLDER);
-
 				/*still need to store $DEF name = value $END in case variables are used in a (paragraph) block
 				 *but there is no definition at the beginning of the (paragraph) block
 				 *will have to ignore when converting to html
 				 */
 				temp = MySyntaxAnalyzer.tokenStack.pop();
-
-				System.out.println("from syntax analyzer temp should be varName -" + temp + "-");
-
-
-				//MySyntaxAnalyzer.tokenStack.push(temp);
-				//temp = outputStack.pop();
-
+				
+				System.out.println("Checking temp --" + temp + "-- against varName --" + varName + "--");
+				
 				if(ignoreSpaces(temp).equals(ignoreSpaces(varName))){
-
-					System.out.println("The variable names matched   " + temp);
-
 					MySyntaxAnalyzer.tokenStack.push(temp);
-
 					//stores equals sign
 					temp = outputStack.pop();
 					MySyntaxAnalyzer.tokenStack.push(temp);
-
-					System.out.println("The temp should have been =  -" + temp + "-");
-
 					//gets the variable definition
 					temp = outputStack.pop();
 					MySyntaxAnalyzer.tokenStack.push(temp);
 					variableDef = temp;
-
 					//stores $END
 					temp = outputStack.pop();
 					MySyntaxAnalyzer.tokenStack.push(temp);
-
-					System.out.println("Did it store the $END????  :" + temp);
-
-
 					temp = outputStack.pop();
-
-					System.out.println("temp before replace method  -" + temp + "-");
-
+					System.out.println("DO YOU GET HERE ALSO for var name " + varName);
 					variableReplace();
+					variableCheck();
 					break;
+				} else{
+					outputStack.push(temp);
 				}
 			} else if(temp.equals(Tokens.DOCB)){
+				System.out.println("ERROR HERE varName");
 				System.out.println("Semantic error: " + varName + " is undefined.  Exiting conversion process.");
 				System.exit(1);
 			}
@@ -202,6 +138,8 @@ public class MySemanticAnalyzer {
 	}
 
 	public void ignoreBlockSearch(){
+		//Need to pop once, otherwise } was being stored twice
+		outputStack.pop();
 		while(!temp.equals(Tokens.PARAB)){
 			outputStack.push(temp);
 			temp = MySyntaxAnalyzer.tokenStack.pop();
@@ -262,6 +200,25 @@ public class MySemanticAnalyzer {
 		case Tokens.DOCE:
 			outputString = outputString + "</html>";
 			System.out.println(outputString);
+			
+			BufferedWriter output = null;
+	        try {
+	            File file = new File("outputFile.txt");
+	            output = new BufferedWriter(new FileWriter(file));
+	            output.write(outputString);
+	            openHTMLFileInBrowswer("outputFile.txt");
+	        } catch ( IOException e ) {
+	            e.printStackTrace();
+	        } finally {
+	            if ( output != null )
+					try {
+						output.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	        }
+			
 			break;
 		case Tokens.DEFB:
 			//do nothing to drop $DEF
@@ -387,6 +344,21 @@ public class MySemanticAnalyzer {
 			convertToHTML();
 			break;
 		}
+	}
+	void openHTMLFileInBrowswer(String htmlFileStr){
+		File file= new File(htmlFileStr.trim());
+		if(!file.exists()){
+			System.err.println("File "+ htmlFileStr +" does not exist.");
+			return;
+		}
+		try{
+			Desktop.getDesktop().browse(file.toURI());
+		}
+		catch(IOException ioe){
+			System.err.println("Failed to open file");
+			ioe.printStackTrace();
+		}
+		return ;
 	}
 
 }
