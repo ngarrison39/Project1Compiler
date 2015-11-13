@@ -18,6 +18,8 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 
 	/* breaks loop if getCharacter causes the end of the file to be reached */
 	public static boolean reachedEnd = false;
+	/* If this is true the previous token must be a parenthesis to allow special symbols such as ~, `, -, _, etc. for a URL that otherwise would not be allowed */
+	public boolean wasParan = false;
 
 	public MyLexicalAnalyzer(){
 		completeFile = "";
@@ -51,13 +53,13 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 		}
 		else if(currentPosition == completeFile.length()){
 			if(reachedEnd != true){
-				if(noSpecialTags(Tokens.currentToken)){
+			if(lookupToken(Tokens.currentToken)){
+				storeToken(Tokens.currentToken);
+				reachedEnd = true;
+			} else if(noSpecialTags(Tokens.currentToken)){
 					storeToken(Tokens.currentToken);
 					reachedEnd = true;
-				} else if(lookupToken(Tokens.currentToken)){
-					storeToken(Tokens.currentToken);
-					reachedEnd = true;
-				}
+				} 
 			}
 		}
 	}
@@ -114,6 +116,15 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 		tokenBin = saveToken;
 		Tokens.currentToken = "";
 	}
+	/* This method checks to see if the text found is a special text symbol that is not allowed */
+	public static boolean isSpecialText(String text){
+		if(text.equals("`") || text.equals("-") || text.equals("_") || text.equals("&") ){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
 	/* Handles the symbol/text states to properly manage each character */
 	public void charStates(String thisChar){
 		switch (thisChar) {
@@ -121,6 +132,7 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			/*for tokens beginning with '#' */
 		case Tokens.DOLLAR:
 			/* for tokens beginning with '$' */
+			wasParan = false;
 			addCharacter(thisChar);
 			getCharacter(completeFile);
 			while(!isSpace(nextCharacter)){
@@ -164,10 +176,18 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			/* for single character token AUDIO */
 		case Tokens.VIDEO: 
 			/* for single character token VIDEO */
-		case Tokens.ADDRESSB: 
-			/* for single character token ADDRESSB */
 		case Tokens.ADDRESSE: 
 			/* for single character token ADDRESSE */
+			wasParan = false;
+			addCharacter(thisChar);
+			if(lookupToken(Tokens.currentToken)){
+				storeToken(Tokens.currentToken);
+			}
+			break;
+		/* Separate from other cases to set boolean to allow special symbols/text within the address text*/
+		case Tokens.ADDRESSB: 
+			/* for single character token ADDRESSB */
+			wasParan = true;
 			addCharacter(thisChar);
 			if(lookupToken(Tokens.currentToken)){
 				storeToken(Tokens.currentToken);
@@ -175,6 +195,7 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			break;
 		case Tokens.ITALICS: 
 			//for single character token ITALICS or two character token BOLD
+			wasParan = false;
 			addCharacter(thisChar);
 			getCharacter(completeFile);
 			if(nextCharacter.equals(Tokens.ITALICS)){
@@ -190,6 +211,15 @@ public class MyLexicalAnalyzer implements LexicalAnalyzer{
 			break;
 		default: 
 			/* default is used for any plain text, whitespace, \t, etc. */
+			
+			if(isSpecialText(thisChar)){
+				if(wasParan == false){
+					System.out.println("Lexical error on character:");
+					System.out.println(thisChar);
+					System.out.println("is undefined for this language. Exiting compiler.");
+					System.exit(1);
+				}
+			}
 			addCharacter(thisChar);
 			getCharacter(completeFile);
 			if(reachedEnd == true){
