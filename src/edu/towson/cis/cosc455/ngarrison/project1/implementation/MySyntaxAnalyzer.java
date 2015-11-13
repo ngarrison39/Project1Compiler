@@ -163,6 +163,7 @@ public class MySyntaxAnalyzer implements SyntaxAnalyzer{
 			head();
 		} else if(allSpaces(MyLexicalAnalyzer.tokenBin)){
 			addToParseStack();
+			askForToken();
 			head();
 		} else{
 			System.out.println("Syntax error on token:");

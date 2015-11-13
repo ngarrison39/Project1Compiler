@@ -126,7 +126,6 @@ public class MySemanticAnalyzer {
 				temp = outputStack.pop();
 			}
 		}
-
 	}
 	/* Used to skip over paragraph blocks that should not be search for a variable definition based on scope */
 	public void ignoreBlockSearch(){
