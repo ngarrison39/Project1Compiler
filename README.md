@@ -3,8 +3,10 @@ Software: For this project I used Eclipse (Mars.1) with the Subclipse installed.
 
 GitHub: https://github.com/ngarrison39/Project1Compiler
 
-Run procedure: Compiles with the executable Jar file.  To run the program enter a document with a .mkd extension.
- From the command line: C:\> java -jar Project1Compiler Test2.mkd  
+Run procedure: Contains an executable Jar file that can be run in the command line, but also contains the code to be run in an IDE such as Eclipse.
+ 
+ From the command line: Go to the directory where the project is stored (using cd directoryName).  In my case it was C:\Users\Nick's\workspace\CompilerProject1>  Now enter the following command:   java -jar CompilerProject1.jar   This will start the program and print a prompt asking for the fileName of .mkd extension.  Enter a filename such as MyTest.mkd (really, try this one).
+ 
  To run from Eclipse IDE: if the file is within the same directory, the file name with extension is sufficient, for example Test2.mkd would work.  If the files are not located in the same directory, using the file path will work as well, for example C:\\Users\\Nick's\\workspace\\CompilerProject1\\Test2.mkd *Note* A second \ must be present otherwise the file path will be examined as escape clauses. 
 
 Known Bugs: 
