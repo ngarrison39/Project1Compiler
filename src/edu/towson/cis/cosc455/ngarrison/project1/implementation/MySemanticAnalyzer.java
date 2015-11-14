@@ -7,11 +7,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class MySemanticAnalyzer {
-	public MySemanticAnalyzer(){
+public class MySemanticAnalyzer 
+{
+	
+	public MySemanticAnalyzer()
+	{	
 		variableCheck();
 		convertToHTML();
-	}
+	 }
 
 	public Stack<String> outputStack = new Stack<String>();
 	/* Variables to be used with stack manipulation */
@@ -200,12 +203,13 @@ public class MySemanticAnalyzer {
 			break;
 		case Tokens.DOCE:
 			outputString = outputString + "</html>";
+			String outFile = MyCompiler.fileName.substring(0, (MyCompiler.fileName.length() - 3)) + "html";
 			BufferedWriter output = null;
 			try {
-				File file = new File("outputFile.html");
+				File file = new File(outFile);
 				output = new BufferedWriter(new FileWriter(file));
 				output.write(outputString);
-				openHTMLFileInBrowswer("outputFile.html");
+				openHTMLFileInBrowswer(outFile);
 			} catch ( IOException e ) {
 				e.printStackTrace();
 			} finally {
@@ -240,7 +244,8 @@ public class MySemanticAnalyzer {
 				closeHead = false;
 				convertToHTML();
 			}	
-		case Tokens.ITALICS: 
+			break;
+		case Tokens.ITALICS:
 			if(closeItalics == false){
 				outputString = outputString + "<i>";
 				closeItalics = true;
@@ -251,7 +256,7 @@ public class MySemanticAnalyzer {
 				convertToHTML();
 			}
 			break;
-		case Tokens.BOLD: 
+		case Tokens.BOLD:
 			if(closeBold == false){
 				outputString = outputString + "<b>";
 				closeBold = true;
@@ -262,23 +267,23 @@ public class MySemanticAnalyzer {
 				convertToHTML();
 			}
 			break;
-		case Tokens.TITLEB:  
+		case Tokens.TITLEB: 
 			outputString = outputString + "<title>";
 			convertToHTML();
 			break;
-		case Tokens.TITLEE:  
+		case Tokens.TITLEE: 
 			outputString = outputString + "</title>";
 			convertToHTML();
 			break;
-		case Tokens.PARAB:  
+		case Tokens.PARAB: 
 			outputString = outputString + "<p>";
 			convertToHTML();
 			break;
-		case Tokens.PARAE:  
+		case Tokens.PARAE:
 			outputString = outputString + "</p>";
 			convertToHTML();
 			break;
-		case Tokens.LISTITEMB: 
+		case Tokens.LISTITEMB:
 			outputString = outputString + "<li>";
 			convertToHTML();
 			break;
@@ -291,46 +296,72 @@ public class MySemanticAnalyzer {
 			convertToHTML();
 			break;
 		case Tokens.LINKB: 
-			String description;
-			String addressL;
+			String description = "";
+			String addressL = "";
 			/* Set beginning of link from [ */
-			outputString = outputString + "<a href=\"";
+			outputString = outputString + "<a href=\" ";
 			/* Save the description for later in link format */
-			description = outputStack.pop();
-			/* Ignore the closing ] */
-			outputStack.pop();
+			temp = outputStack.pop();
+			while(!temp.equals(Tokens.LINKE)){
+				description += temp.trim();
+				temp = outputStack.pop();
+			}
+			/* Ignore the closing ] by doing nothing with it*/
+
 			/* Ignore the opening ( */
 			outputStack.pop();
-			addressL = outputStack.pop();
-			/* Ignore the closing ) */
-			outputStack.pop();
-			outputString = outputString + addressL + "\">" + description + "</a>";
+			/* Start getting the address text */
+			temp = outputStack.pop();
+			/* Save the address */
+			while(!temp.equals(Tokens.ADDRESSE)){
+				addressL += temp.trim();
+				temp = outputStack.pop();
+			}
+			/* Ignore the closing ) by doing nothing with it */
+
+			outputString = outputString + addressL + " \">" + description + "</a>";
 			convertToHTML();
 			break;
 		case Tokens.AUDIO:
-			String addressA;
+			String addressA = "";
 			/* Set beginning of link from @ */
-			outputString = outputString + "<audio controls> <source src=\"";
+			outputString = outputString + "<audio controls> <source src=\" ";
 			/* Ignore the opening ( */
 			outputStack.pop();
+			
+			/* Start getting the address text */
+			temp = outputStack.pop();
+			
 			/* Save the address */
-			addressA = outputStack.pop();
-			/* Ignore the closing ) */
-			outputStack.pop();
-			outputString = outputString + addressA + "\"> </audio>";
+			while(!temp.equals(Tokens.ADDRESSE)){
+				addressA += temp.trim();
+				temp = outputStack.pop();
+			}
+			
+			/* Ignore the closing ) by doing nothing with it */
+
+			outputString = outputString + addressA + " \"> </audio>";
 			convertToHTML();
 			break;
 		case Tokens.VIDEO:
-			String addressV;
+			String addressV = "";
 			/* Set beginning of link from % */
-			outputString = outputString + "<iframe src=\"";
+			outputString = outputString + "<iframe width=\"560\" height=\"315\" src=\" ";
 			/* Ignore the opening ( */
 			outputStack.pop();
+			
+			/* Start getting the address text */
+			temp = outputStack.pop();
+			
 			/* Save the address */
-			addressV = outputStack.pop();
-			/* Ignore the closing ) */
-			outputStack.pop();
-			outputString = outputString + addressV + "\"/>";
+			while(!temp.equals(Tokens.ADDRESSE)){
+				addressV += temp.trim();
+				temp = outputStack.pop();
+			}
+			
+			/* Ignore the closing ) by doing nothing with it */
+			
+			outputString = outputString + addressV + "\"frameborder=\"0\" allowfullscreen></iframe>";
 			convertToHTML();
 			break;
 		default: 

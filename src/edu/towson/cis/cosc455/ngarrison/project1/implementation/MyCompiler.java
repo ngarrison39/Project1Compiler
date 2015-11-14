@@ -6,8 +6,9 @@ import java.util.Scanner;
 
 public class MyCompiler {
 	public static String completeFile = "";
+	public static String fileName = "";
 	public static void main(String args[]){
-		String fileName = "";
+		//String fileName = "";
 		Scanner input = new Scanner(System.in);
 		System.out.println("Enter the filename to be used with extension .mkd :");
 		/* hasNextLine to use filepath */
